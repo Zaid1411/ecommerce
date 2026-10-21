@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Filter, SlidersHorizontal, Search, RotateCcw, Check } from 'lucide-react';
+import { SlidersHorizontal, RotateCcw } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { productService } from '../services/api';
 
@@ -18,7 +18,7 @@ export default function ShopPage() {
   const [sortBy, setSortBy] = useState('featured');
   const [maxPrice, setMaxPrice] = useState(1000);
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Sync state with URL params
   useEffect(() => {
@@ -93,36 +93,36 @@ export default function ShopPage() {
 
   return (
     <div className="bg-[#FAF8F5] min-h-screen pb-24">
-      {/* Editorial Header Banner */}
-      <div className="bg-[#1C1917] text-white py-14 sm:py-20 border-b border-stone-800">
+      {/* Editorial Header */}
+      <div className="border-b border-stone-200/80 py-10 sm:py-14 bg-white/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-[11px] uppercase tracking-[0.25em] text-[#BBA28C] block mb-2 font-medium">
-            Autumn / Winter Lookbook
+          <span className="text-[10px] uppercase tracking-[0.3em] text-stone-500 block mb-1 font-semibold">
+            Autumn / Winter 2026 Lookbook
           </span>
-          <h1 className="font-serif text-3xl sm:text-5xl font-normal tracking-tight">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-stone-900 tracking-tight">
             Ready-to-Wear Collection
           </h1>
-          <p className="max-w-xl mx-auto text-xs sm:text-sm text-stone-300 mt-3 font-light leading-relaxed">
-            Essential Oxford shirts, pleated virgin wool trousers, selvedge denim, and cashmere overcoats designed with timeless proportions.
+          <p className="max-w-lg mx-auto text-xs sm:text-sm text-stone-500 mt-2.5 font-light leading-relaxed">
+            Essential Oxford shirts, pleated virgin wool trousers, structured overshirts, and organic fleece loungewear.
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         
-        {/* Filter & Controls Toolbar */}
-        <div className="bg-white border border-stone-200 p-4 mb-8 flex flex-wrap items-center justify-between gap-4">
+        {/* Sleek Filter & Category Toolbar */}
+        <div className="border-b border-stone-200 pb-5 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           
           {/* Category Tabs */}
-          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-none">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => handleCategoryChange(cat)}
-                className={`px-3.5 py-1.5 text-xs uppercase tracking-wider font-medium transition-all ${
+                className={`px-4 py-2 text-xs uppercase tracking-[0.18em] font-medium transition-all whitespace-nowrap ${
                   selectedCategory === cat
-                    ? 'bg-stone-900 text-white'
-                    : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                    ? 'bg-[#1C1917] text-white shadow-sm'
+                    : 'bg-white border border-stone-200/90 text-stone-700 hover:border-stone-400'
                 }`}
               >
                 {cat}
@@ -131,53 +131,51 @@ export default function ShopPage() {
           </div>
 
           {/* Right Toolbar Controls */}
-          <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-            {/* Sort Select */}
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-stone-500 uppercase tracking-wider hidden md:inline">Sort:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-stone-50 border border-stone-300 px-3 py-1.5 text-xs text-stone-800 focus:outline-none focus:border-stone-900"
-              >
-                <option value="featured">Featured Garments</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
-              </select>
-            </div>
+          <div className="flex items-center justify-between md:justify-end gap-4">
+            <span className="text-xs text-stone-500 font-light">
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'Garment' : 'Garments'}
+            </span>
 
-            {/* Mobile Filter Toggle */}
-            <button
-              onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-              className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 text-xs border border-stone-300 bg-stone-50 text-stone-800"
+            {/* Sort Select */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-white border border-stone-200 px-3 py-2 text-xs text-stone-800 focus:outline-none focus:border-stone-900 uppercase tracking-wider cursor-pointer"
             >
-              <SlidersHorizontal size={14} /> Filters
+              <option value="featured">Sort: Featured</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating">Highest Rated</option>
+            </select>
+
+            {/* Filter Toggle */}
+            <button
+              onClick={() => setFiltersOpen(!filtersOpen)}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs border border-stone-200 bg-white text-stone-800 hover:border-stone-400 uppercase tracking-wider"
+            >
+              <SlidersHorizontal size={13} />
+              <span>Filter</span>
             </button>
           </div>
         </div>
 
-        {/* Layout Grid: Sidebar Filters + Products */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
-          {/* Desktop Sidebar Filters */}
-          <aside className={`lg:block ${mobileFiltersOpen ? 'block' : 'hidden'} lg:col-span-1 space-y-6`}>
-            <div className="bg-white border border-stone-200 p-6 space-y-6">
-              
-              <div className="flex items-center justify-between border-b border-stone-200 pb-3">
-                <span className="font-serif text-lg font-normal text-stone-900">Refine Search</span>
-                <button
-                  onClick={handleResetFilters}
-                  className="text-[11px] text-stone-500 hover:text-stone-900 flex items-center gap-1 uppercase tracking-wider"
-                >
-                  <RotateCcw size={12} /> Reset
-                </button>
-              </div>
+        {/* Collapsible Refine Drawer */}
+        {filtersOpen && (
+          <div className="bg-white border border-stone-200 p-6 mb-8 space-y-4 animate-fadeIn">
+            <div className="flex justify-between items-center border-b border-stone-100 pb-3">
+              <span className="font-serif text-base font-normal text-stone-900">Refine Collection</span>
+              <button
+                onClick={handleResetFilters}
+                className="text-[11px] text-stone-500 hover:text-stone-900 flex items-center gap-1 uppercase tracking-wider font-medium"
+              >
+                <RotateCcw size={12} /> Reset Filters
+              </button>
+            </div>
 
-              {/* Price Range */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
               <div>
-                <label className="text-xs uppercase tracking-widest text-stone-700 font-semibold block mb-2">
-                  Maximum Price: ${maxPrice.toLocaleString()} USD
+                <label className="text-[11px] uppercase tracking-widest text-stone-700 font-semibold block mb-2">
+                  Max Price: ${maxPrice.toLocaleString()} USD
                 </label>
                 <input
                   type="range"
@@ -188,78 +186,50 @@ export default function ShopPage() {
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
                   className="w-full accent-stone-900 cursor-pointer"
                 />
-                <div className="flex justify-between text-[10px] text-stone-400 mt-1">
-                  <span>$150</span>
-                  <span>$1,000+</span>
-                </div>
               </div>
 
-              {/* Stock Availability */}
-              <div className="border-t border-stone-200 pt-4">
-                <label className="flex items-center gap-2 cursor-pointer text-xs text-stone-700 select-none">
+              <div className="flex items-center">
+                <label className="flex items-center gap-2.5 cursor-pointer text-xs text-stone-700 select-none">
                   <input
                     type="checkbox"
                     checked={inStockOnly}
                     onChange={(e) => setInStockOnly(e.target.checked)}
-                    className="accent-stone-900 w-4 h-4 rounded-none"
+                    className="accent-stone-900 w-4 h-4 rounded-none cursor-pointer"
                   />
                   <span>Show In-Stock Garments Only</span>
                 </label>
               </div>
-
-              {/* Tailoring Guarantee Box */}
-              <div className="border-t border-stone-200 pt-4 text-xs text-stone-500 space-y-2">
-                <p className="font-medium text-stone-800">Sizing & Tailoring Support</p>
-                <p className="text-[11px] leading-relaxed">
-                  Every trouser and shirt is cut with traditional seam allowances to facilitate tailored alterations by your local tailor.
-                </p>
-              </div>
-
             </div>
-          </aside>
+          </div>
+        )}
 
-          {/* Product Listing Grid */}
-          <main className="lg:col-span-3">
-            
-            {/* Header info */}
-            <div className="flex justify-between items-center mb-6 text-xs text-stone-600">
-              <p>
-                Showing <span className="font-semibold text-stone-900">{filteredProducts.length}</span> luxury {filteredProducts.length === 1 ? 'garment' : 'garments'}
-                {searchQuery && (
-                  <span> matching "<span className="italic font-medium">{searchQuery}</span>"</span>
-                )}
-              </p>
-            </div>
-
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <div key={n} className="animate-pulse bg-white border border-stone-200 aspect-[3/4]" />
-                ))}
-              </div>
-            ) : filteredProducts.length === 0 ? (
-              <div className="bg-white border border-stone-200 p-12 text-center my-8">
-                <p className="font-serif text-xl text-stone-800 mb-2">No matching garments found</p>
-                <p className="text-xs text-stone-500 mb-6 max-w-sm mx-auto">
-                  Try broadening your price range, clearing search terms, or exploring other apparel categories.
-                </p>
-                <button
-                  onClick={handleResetFilters}
-                  className="bg-stone-900 text-white text-xs uppercase tracking-widest px-6 py-3 font-medium hover:bg-stone-800 transition-colors"
-                >
-                  Clear All Filters
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id || product._id} product={product} />
-                ))}
-              </div>
-            )}
-
-          </main>
-        </div>
+        {/* Product Grid */}
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+              <div key={n} className="animate-pulse bg-[#F0EEE9] aspect-[3/4]" />
+            ))}
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-24 bg-white border border-stone-200/80 p-8">
+            <h2 className="font-serif text-2xl text-stone-900 mb-2">No Matching Garments Found</h2>
+            <p className="text-xs text-stone-500 mb-6 font-light">
+              Try adjusting your category filter, price slider, or search keywords.
+            </p>
+            <button
+              onClick={handleResetFilters}
+              className="bg-[#1C1917] text-white px-6 py-2.5 text-xs uppercase tracking-widest font-medium hover:bg-stone-800 transition-colors"
+            >
+              Reset All Filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-10 sm:gap-y-12">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id || product._id} product={product} />
+            ))}
+          </div>
+        )}
 
       </div>
     </div>

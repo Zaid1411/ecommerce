@@ -10,24 +10,23 @@ export const MOCK_PRODUCTS = [
     countInStock: 14,
     isFeatured: true,
     leadTime: "In Stock - Dispatches in 24h",
-    color: "Charcoal Melange",
-    colors: ["Charcoal Melange", "Midnight Navy", "Oatmeal Beige"],
+    color: "Black",
+    colors: ["Black", "Midnight Navy", "Charcoal Melange"],
     sizes: ["S", "M", "L", "XL"],
     defaultSize: "M",
     fabric: "100% Super 120s Italian Virgin Wool",
-    image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=1200&auto=format&fit=crop",
+    image: "/assets/prod_pants_pleated.jpg",
     images: [
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=1200&auto=format&fit=crop"
+      "/assets/prod_pants_pleated.jpg"
     ],
     description: "An architectural trouser cut with a subtle double reverse pleat and generous relaxed drape. Tailored from premium Italian virgin wool flannel with horn button closures and adjustable side tabs.",
-    fit: "Relaxed straight leg with gentle break. Model is 185cm wearing size M.",
+    fit: "Relaxed straight leg with gentle break. Model is 186cm wearing size M.",
     craftsmanship: "Hand-finished waistband, taped hems, crafted in Portugal."
   },
   {
     id: "fash-002",
     _id: "fash-002",
-    name: "Heavyweight Boxy Oxford Button-Down Shirt",
+    name: "Regular Fit Oxford Button-Down Shirt",
     category: "Shirts",
     price: 220,
     rating: 4.8,
@@ -35,15 +34,14 @@ export const MOCK_PRODUCTS = [
     countInStock: 22,
     isFeatured: true,
     leadTime: "In Stock - Ships next day",
-    color: "Raw Ecru",
-    colors: ["Raw Ecru", "Sky Blue Stripe", "Crisp White"],
+    color: "Sky Blue",
+    colors: ["Sky Blue", "Raw Ecru", "Crisp White"],
     sizes: ["S", "M", "L", "XL"],
     defaultSize: "L",
     fabric: "100% Organic Combed Cotton (240 GSM)",
-    image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1200&auto=format&fit=crop",
+    image: "/assets/prod_shirt_oxford.jpg",
     images: [
-      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1200&auto=format&fit=crop"
+      "/assets/prod_shirt_oxford.jpg"
     ],
     description: "The quintessential modern Oxford shirt reimagined with relaxed dropped shoulders and a substantial heavyweight cotton weave. Finished with mother-of-pearl buttons and a soft unlined collar.",
     fit: "Boxy, relaxed silhouette. Take your normal size for an easy drape.",
@@ -52,147 +50,146 @@ export const MOCK_PRODUCTS = [
   {
     id: "fash-003",
     _id: "fash-003",
-    name: "Double-Breasted Cashmere Blend Overcoat",
+    name: "Structured Cotton Twill Overshirt",
     category: "Outerwear",
-    price: 890,
+    price: 380,
     rating: 5.0,
     numReviews: 29,
-    countInStock: 7,
+    countInStock: 8,
     isFeatured: true,
-    leadTime: "Limited Edition - Only 7 Remaining",
-    color: "Camel Tan",
-    colors: ["Camel Tan", "Deep Espresso", "Black"],
+    leadTime: "Limited Edition - Only 8 Remaining",
+    color: "Espresso Brown",
+    colors: ["Espresso Brown", "Midnight Black", "Olive Twill"],
     sizes: ["S", "M", "L", "XL"],
     defaultSize: "M",
-    fabric: "90% Merino Wool, 10% Mongolian Cashmere",
-    image: "https://images.unsplash.com/photo-1544923246-77307dd654cb?q=80&w=1200&auto=format&fit=crop",
+    fabric: "100% Heavyweight Cotton Twill (320 GSM)",
+    image: "/assets/prod_jacket_harrington.jpg",
     images: [
-      "https://images.unsplash.com/photo-1544923246-77307dd654cb?q=80&w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=1200&auto=format&fit=crop"
+      "/assets/prod_jacket_harrington.jpg"
     ],
-    description: "A commanding tailored statement piece with broad peak lapels and a calf-length drape. Woven in Biella, Italy, blending fine wool with cashmere for supreme softness and warmth.",
+    description: "A commanding tailored statement piece with twin chest utility pockets and a relaxed boxy cut. Woven from durable combed cotton twill with real horn button closures.",
     fit: "Structured shoulder with relaxed torso, accommodates layered knitwear.",
-    craftsmanship: "Fully canvassed chest, cupro cupro lining, real horn buttons."
+    craftsmanship: "Fully lined in breathable cotton viscose, taped interior seams."
   },
   {
     id: "fash-004",
     _id: "fash-004",
-    name: "Waffle Knit Chunky Merino Crewneck",
-    category: "Knitwear",
-    price: 290,
+    name: "Relaxed French Linen Camp Collar Shirt",
+    category: "Shirts",
+    price: 260,
     rating: 4.9,
     numReviews: 47,
     countInStock: 16,
     isFeatured: true,
     leadTime: "In Stock - Dispatches in 24h",
-    color: "Oatmeal Melange",
-    colors: ["Oatmeal Melange", "Forest Green", "Charcoal"],
+    color: "Rich Espresso",
+    colors: ["Rich Espresso", "Sage Moss", "Cream Linen"],
     sizes: ["S", "M", "L", "XL"],
     defaultSize: "M",
-    fabric: "100% Extra-Fine New Zealand Merino Wool",
-    image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=1200&auto=format&fit=crop",
+    fabric: "100% French Natural Linen",
+    image: "/assets/prod_polo_merino.jpg",
     images: [
-      "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=1200&auto=format&fit=crop"
+      "/assets/prod_polo_merino.jpg"
     ],
-    description: "Tactile thermal waffle texture knitted from non-mulesed New Zealand merino wool. Provides natural thermoregulation, breathable comfort, and effortless drape.",
-    fit: "Slightly relaxed body with ribbed collar, cuffs, and hem.",
-    craftsmanship: "Fully fashioned seamless knitting, zero waste construction."
+    description: "Lightweight and airy with a lustrous tactile texture. Designed with an open Cuban camp collar, straight vented hem, and natural shell buttons.",
+    fit: "Relaxed holiday fit designed to be worn untucked or over a tank.",
+    craftsmanship: "French felled seams, pre-washed for extra softness."
   },
   {
     id: "fash-005",
     _id: "fash-005",
-    name: "Japanese Selvedge Denim Wide-Leg Jean",
+    name: "Heavyweight Relaxed French Terry Trousers",
     category: "Pants",
-    price: 280,
+    price: 260,
     rating: 4.8,
     numReviews: 33,
     countInStock: 11,
     isFeatured: false,
     leadTime: "In Stock",
-    color: "Indigo Raw Wash",
-    colors: ["Indigo Raw Wash", "Washed Charcoal", "Ecru Selvedge"],
+    color: "Washed Charcoal",
+    colors: ["Washed Charcoal", "Midnight Navy", "Heather Grey"],
     sizes: ["S", "M", "L", "XL"],
     defaultSize: "M",
-    fabric: "13.5oz Kurabo Japanese Selvedge Cotton",
-    image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1200&auto=format&fit=crop",
+    fabric: "100% Heavyweight Organic Loopback Cotton (450 GSM)",
+    image: "/assets/prod_denim_selvedge.jpg",
     images: [
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1200&auto=format&fit=crop"
+      "/assets/prod_denim_selvedge.jpg"
     ],
-    description: "Woven on vintage shuttle looms in Okayama, Japan. Features a clean wide-leg cut with a classic mid-rise, red selvedge ticker ID, and solid brass button fly.",
-    fit: "High-waisted, wide straight leg. Unwashed raw denim that breaks in over time.",
-    craftsmanship: "Chain-stitched hems, custom oxidized copper rivets."
+    description: "An architectural leisure trouser cut with a clean straight break and elasticated drawstring waistband. Tailored from substantial loopback French terry with silver eyelets.",
+    fit: "Relaxed straight leg drape. Sits comfortably at natural waist.",
+    craftsmanship: "Bar-tacked pocket corners, preshrunk organic cotton."
   },
   {
     id: "fash-006",
     _id: "fash-006",
-    name: "Relaxed Camp Collar Silk-Linen Overshirt",
+    name: "Relaxed-Fit Windowpane Flannel Shirt",
     category: "Shirts",
-    price: 260,
+    price: 240,
     rating: 4.7,
     numReviews: 21,
     countInStock: 18,
     isFeatured: false,
     leadTime: "In Stock",
-    color: "Sage Moss",
-    colors: ["Sage Moss", "Cream Linen", "Midnight Black"],
+    color: "Navy Check",
+    colors: ["Navy Check", "Washed Ecru", "Charcoal Melange"],
     sizes: ["S", "M", "L", "XL"],
     defaultSize: "L",
-    fabric: "55% French Linen, 45% Mulberry Silk",
-    image: "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?q=80&w=1200&auto=format&fit=crop",
+    fabric: "100% Brushed Organic Cotton Flannel",
+    image: "/assets/prod_shirt_linen.jpg",
     images: [
-      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?q=80&w=1200&auto=format&fit=crop"
+      "/assets/prod_shirt_linen.jpg"
     ],
-    description: "Lightweight and airy with a lustrous tactile texture. Designed with an open Cuban camp collar, straight vented hem, and chest patch pocket.",
-    fit: "Relaxed holiday fit designed to be worn untucked or over a tank.",
-    craftsmanship: "Natural shell buttons, French felled seam finishing."
+    description: "Modern architectural windowpane grid woven in a brushed, ultra-soft organic cotton flannel. Dropped shoulders with twin patch pockets and horn buttons.",
+    fit: "Easy, relaxed overshirt fit. Perfect for layering over white tees.",
+    craftsmanship: "Reinforced yoke, double-stitched stress points."
   },
   {
     id: "fash-007",
     _id: "fash-007",
-    name: "Structured Cotton Twill Harrington Jacket",
-    category: "Outerwear",
-    price: 450,
+    name: "Relaxed Fleece Crewneck & Lounge Trousers",
+    category: "Knitwear",
+    price: 290,
     rating: 4.9,
     numReviews: 19,
     countInStock: 9,
     isFeatured: false,
     leadTime: "In Stock - Dispatches in 24h",
-    color: "Midnight Navy",
-    colors: ["Midnight Navy", "British Khaki"],
+    color: "Heather Grey",
+    colors: ["Heather Grey", "Oatmeal Melange", "Midnight Black"],
     sizes: ["S", "M", "L", "XL"],
     defaultSize: "M",
-    fabric: "100% Water-Resistant Heavyweight Cotton Twill",
-    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1200&auto=format&fit=crop",
+    fabric: "100% Organic Combed Cotton Fleece",
+    image: "/assets/prod_knit_merino.jpg",
     images: [
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1200&auto=format&fit=crop"
+      "/assets/prod_knit_merino.jpg"
     ],
-    description: "A refined British heritage silhouette modernized with clean minimalist lines, brushed two-way Swiss Raccagni zipper, and elasticated side hem.",
-    fit: "Classic regular fit with raglan sleeves for ease of movement.",
-    craftsmanship: "Lined in breathable viscose tartan, storm flap collar."
+    description: "A refined loungewear essential. Knitted in heavyweight fleece with a clean ribbed crew collar, dropped shoulder seams, and relaxed straight trousers.",
+    fit: "Relaxed contemporary fit with clean aesthetic drape.",
+    craftsmanship: "Seamless flatlock stitching, zero twisting after wash."
   },
   {
     id: "fash-008",
     _id: "fash-008",
-    name: "Ribbed Merino Knit Polo Shirt",
+    name: "Quarter-Zip Relaxed Funnel Neck Sweatshirt",
     category: "Knitwear",
-    price: 240,
+    price: 310,
     rating: 4.8,
     numReviews: 27,
     countInStock: 15,
     isFeatured: false,
     leadTime: "In Stock",
-    color: "Espresso Brown",
-    colors: ["Espresso Brown", "Ivory Cream", "Slate Grey"],
+    color: "Midnight Navy",
+    colors: ["Midnight Navy", "Washed Charcoal", "Slate Grey"],
     sizes: ["S", "M", "L", "XL"],
     defaultSize: "M",
-    fabric: "100% Ultra-Fine 16-Gauge Merino Wool",
-    image: "https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1200&auto=format&fit=crop",
+    fabric: "100% Heavyweight Organic Cotton Fleece",
+    image: "/assets/prod_coat_camel.jpg",
     images: [
-      "https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1200&auto=format&fit=crop"
+      "/assets/prod_coat_camel.jpg"
     ],
-    description: "An understated luxury essential. Knitted in a fine 16-gauge ribbed stitch with a placket-less Johnny collar and clean linked seams.",
-    fit: "Tailored contemporary fit. Wear solo or beneath a tailored jacket.",
-    craftsmanship: "Knitted on high-precision German Shima Seiki machines."
+    description: "An understated luxury piece featuring an antique silver quarter-zip, structured high funnel collar, and ribbed cuffs. Designed to be worn as casual outerwear.",
+    fit: "Tailored contemporary fit. Wear solo or over an Oxford button-down.",
+    craftsmanship: "Swiss metal zip pull, durable ribbed waistband."
   }
 ];
 
@@ -200,25 +197,25 @@ export const CATEGORIES = [
   {
     name: "Shirts",
     slug: "shirts",
-    tagline: "Heavyweight Oxfords, French linen & relaxed camp collars",
-    image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=800&auto=format&fit=crop"
+    tagline: "Heavyweight Oxfords, flannels & French linen",
+    image: "/assets/prod_shirt_oxford.jpg"
   },
   {
     name: "Pants",
     slug: "pants",
-    tagline: "Pleated Italian wool flannels, wide selvedge denim & chinos",
-    image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=800&auto=format&fit=crop"
+    tagline: "Pleated Italian wool flannels & relaxed terry",
+    image: "/assets/prod_pants_pleated.jpg"
   },
   {
     name: "Outerwear",
     slug: "outerwear",
-    tagline: "Double-breasted cashmere overcoats & structured jackets",
-    image: "https://images.unsplash.com/photo-1544923246-77307dd654cb?q=80&w=800&auto=format&fit=crop"
+    tagline: "Structured twill overshirts & transitional layers",
+    image: "/assets/prod_jacket_harrington.jpg"
   },
   {
     name: "Knitwear",
     slug: "knitwear",
-    tagline: "Chunky thermal waffle knits & ultra-fine merino polos",
-    image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=800&auto=format&fit=crop"
+    tagline: "Organic combed fleece, quarter-zips & crewnecks",
+    image: "/assets/prod_knit_merino.jpg"
   }
 ];
