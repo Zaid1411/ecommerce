@@ -14,12 +14,12 @@ export default function CheckoutPage() {
     fullName: user?.name || '',
     email: user?.email || '',
     phone: '',
-    address: '14 Karori Road',
-    city: 'Wellington',
-    postalCode: '6012',
-    country: 'New Zealand',
+    address: '742 Evergreen Terrace',
+    city: 'New York',
+    postalCode: '10001',
+    country: 'United States',
     paymentMethod: 'Simulated Card (Test Mode)',
-    notes: 'Please phone 30 minutes prior to delivery.'
+    notes: 'Please leave at front desk reception.'
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,13 +29,13 @@ export default function CheckoutPage() {
   if (cartItems.length === 0 && !completedOrder) {
     return (
       <div className="max-w-md mx-auto text-center py-24 px-4">
-        <h2 className="font-serif text-2xl text-stone-900 mb-2">No items to checkout</h2>
-        <p className="text-xs text-stone-500 mb-6">Your cart is currently empty.</p>
+        <h2 className="font-serif text-2xl text-stone-900 mb-2">No garments to checkout</h2>
+        <p className="text-xs text-stone-500 mb-6">Your shopping bag is currently empty.</p>
         <Link
           to="/shop"
           className="inline-block bg-stone-900 text-white px-6 py-3 text-xs uppercase tracking-widest font-medium"
         >
-          Browse Pieces
+          Browse Garments
         </Link>
       </div>
     );
@@ -58,7 +58,8 @@ export default function CheckoutPage() {
           image: item.image,
           price: item.price,
           product: item.product,
-          selectedFinish: item.selectedFinish,
+          selectedSize: item.selectedSize,
+          selectedColor: item.selectedColor,
         })),
         shippingAddress: {
           fullName: formData.fullName,
@@ -83,11 +84,11 @@ export default function CheckoutPage() {
         // Fallback simulated order for demonstration if backend DB is not yet running
         console.warn('Backend unavailable, generating local simulated order confirmation', err.message);
         created = {
-          _id: `NZ-WW-${Math.floor(100000 + Math.random() * 900000)}`,
+          _id: `ATL-ORD-${Math.floor(100000 + Math.random() * 900000)}`,
           createdAt: new Date().toISOString(),
           ...orderPayload,
           isPaid: true,
-          status: 'In Workshop Handcrafted',
+          status: 'Order Confirmed & Preparing Dispatch',
         };
       }
 
@@ -105,26 +106,26 @@ export default function CheckoutPage() {
     return (
       <div className="bg-[#FAF8F5] min-h-screen py-16">
         <div className="max-w-2xl mx-auto px-4 text-center bg-white border border-stone-200 p-8 sm:p-12 shadow-sm">
-          <div className="w-16 h-16 bg-[#F4EFEA] text-[#8C7355] rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-16 h-16 bg-[#F4EFEA] text-stone-900 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 size={32} />
           </div>
           <span className="text-[11px] uppercase tracking-[0.25em] text-[#8C7355] font-semibold block mb-2">
-            Order Confirmed & Commissioned
+            Order Confirmed & Payment Verified
           </span>
           <h1 className="font-serif text-3xl sm:text-4xl text-stone-900 font-normal mb-3">
-            Thank you for supporting New Zealand craftsmanship.
+            Thank you for shopping with ATELIER.
           </h1>
           <p className="text-xs text-stone-600 mb-6 max-w-lg mx-auto leading-relaxed">
-            Order Reference: <strong className="text-stone-900">#{completedOrder._id}</strong>. A confirmation and timber schedule has been logged for our Nelson cabinetmakers.
+            Order Reference: <strong className="text-stone-900">#{completedOrder._id}</strong>. Your garments are being carefully pressed, packaged in signature archival boxes, and prepped for courier dispatch.
           </p>
 
           <div className="bg-[#FAF8F5] p-6 border border-stone-200 text-left text-xs text-stone-700 space-y-2 mb-8">
             <div className="flex justify-between border-b border-stone-200 pb-2">
-              <span className="font-semibold text-stone-900">Delivery Recipient:</span>
+              <span className="font-semibold text-stone-900">Recipient:</span>
               <span>{completedOrder.shippingAddress.fullName}</span>
             </div>
             <div className="flex justify-between border-b border-stone-200 pb-2">
-              <span className="font-semibold text-stone-900">Delivery Address:</span>
+              <span className="font-semibold text-stone-900">Destination:</span>
               <span>{completedOrder.shippingAddress.address}, {completedOrder.shippingAddress.city}</span>
             </div>
             <div className="flex justify-between border-b border-stone-200 pb-2">
@@ -132,8 +133,8 @@ export default function CheckoutPage() {
               <span className="text-emerald-700 font-medium">Verified Test Checkout</span>
             </div>
             <div className="flex justify-between pt-1 font-semibold text-sm text-stone-900">
-              <span>Total Amount:</span>
-              <span>${completedOrder.totalPrice.toLocaleString()} NZD</span>
+              <span>Total Paid:</span>
+              <span>${completedOrder.totalPrice.toLocaleString()} USD</span>
             </div>
           </div>
 
@@ -148,7 +149,7 @@ export default function CheckoutPage() {
               to="/shop"
               className="bg-stone-100 text-stone-800 px-8 py-3.5 text-xs uppercase tracking-[0.2em] font-medium hover:bg-stone-200 transition-colors"
             >
-              Continue Exploring
+              Continue Browsing
             </Link>
           </div>
         </div>
@@ -162,10 +163,10 @@ export default function CheckoutPage() {
         
         <div className="mb-10 text-center max-w-lg mx-auto">
           <span className="text-[11px] uppercase tracking-[0.25em] text-[#8C7355] font-semibold block mb-1">
-            Secure Commissioning
+            Express Checkout
           </span>
           <h1 className="font-serif text-3xl sm:text-4xl text-stone-900 font-normal">
-            Bespoke Order Checkout
+            Finalize Your Garment Order
           </h1>
         </div>
 
@@ -180,10 +181,10 @@ export default function CheckoutPage() {
           {/* Left Form Column */}
           <div className="lg:col-span-7 space-y-8">
             
-            {/* 1. Recipient & Contact Details */}
+            {/* 1. Recipient Details */}
             <div className="bg-white border border-stone-200 p-6 sm:p-8 space-y-4">
               <h2 className="font-serif text-xl font-normal text-stone-900 border-b border-stone-200 pb-3">
-                1. Recipient & White-Glove Delivery
+                1. Delivery Address & Contact
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -276,14 +277,14 @@ export default function CheckoutPage() {
 
               <div>
                 <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
-                  Delivery Notes / Access Constraints
+                  Courier Delivery Notes
                 </label>
                 <textarea
                   name="notes"
                   rows="2"
                   value={formData.notes}
                   onChange={handleChange}
-                  placeholder="e.g. Spiral staircase, freight elevator access required..."
+                  placeholder="e.g. Leave with doorman or gate code..."
                   className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
                 />
               </div>
@@ -302,10 +303,10 @@ export default function CheckoutPage() {
 
               <div className="bg-[#F4EFEA] p-4 border border-stone-200 text-xs text-stone-700 leading-relaxed">
                 <p className="font-semibold text-stone-900 flex items-center gap-2 mb-1">
-                  <CreditCard size={15} /> Sandbox Demonstration Gateway
+                  <CreditCard size={15} /> Portfolio Sandbox Gateway
                 </p>
                 <p>
-                  In accordance with portfolio security standards, this checkout operates in <strong>simulated mode</strong>. No real credit card details are collected or stored. Submitting this form safely tests order persistence, inventory decrementing, and order confirmation flows.
+                  This checkout operates in <strong>simulated mode</strong>. No real credit card details are collected or charged. Submitting safely demonstrates inventory decrementing, order records, and order history tracking.
                 </p>
               </div>
 
@@ -320,23 +321,8 @@ export default function CheckoutPage() {
                     className="accent-stone-900"
                   />
                   <div className="text-xs">
-                    <span className="font-semibold text-stone-900 block">Instant Simulated Card Approval</span>
-                    <span className="text-stone-500 text-[11px]">Instant test authorization for portfolio validation</span>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3 border border-stone-200 hover:border-stone-400 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="Bespoke Studio Invoice (Bank Deposit)"
-                    checked={formData.paymentMethod === 'Bespoke Studio Invoice (Bank Deposit)'}
-                    onChange={handleChange}
-                    className="accent-stone-900"
-                  />
-                  <div className="text-xs">
-                    <span className="font-semibold text-stone-900 block">Bespoke Workshop Invoice (Simulated Bank Deposit)</span>
-                    <span className="text-stone-500 text-[11px]">Simulates standard 50% deposit commissioning workflow</span>
+                    <span className="font-semibold text-stone-900 block">Instant Simulated Card Authorization</span>
+                    <span className="text-stone-500 text-[11px]">Instant approval for portfolio demonstration</span>
                   </div>
                 </label>
               </div>
@@ -348,17 +334,17 @@ export default function CheckoutPage() {
           <div className="lg:col-span-5">
             <div className="bg-white border border-stone-200 p-6 sm:p-8 space-y-6 sticky top-28">
               <h2 className="font-serif text-xl font-normal text-stone-900 border-b border-stone-200 pb-3">
-                Order Review ({cartItems.length} {cartItems.length === 1 ? 'Piece' : 'Pieces'})
+                Order Review ({cartItems.length} {cartItems.length === 1 ? 'Garment' : 'Garments'})
               </h2>
 
               {/* Items List */}
               <div className="space-y-4 max-h-72 overflow-y-auto pr-1 divide-y divide-stone-100">
                 {cartItems.map((item) => (
                   <div key={item.cartKey} className="flex gap-3 pt-3 first:pt-0">
-                    <img src={item.image} alt={item.name} className="w-14 h-16 object-cover bg-stone-100" />
+                    <img src={item.image} alt={item.name} className="w-14 h-16 object-cover object-top bg-stone-100" />
                     <div className="flex-1 text-xs">
                       <p className="font-medium text-stone-900 leading-tight">{item.name}</p>
-                      <p className="text-[11px] text-[#8C7355] mt-0.5">Finish: {item.selectedFinish}</p>
+                      <p className="text-[11px] text-stone-600 mt-0.5">Size: {item.selectedSize} · {item.selectedColor}</p>
                       <p className="text-stone-500 mt-1">Qty: {item.quantity} × ${item.price.toLocaleString()}</p>
                     </div>
                     <span className="text-xs font-semibold text-stone-900">
@@ -372,17 +358,17 @@ export default function CheckoutPage() {
               <div className="border-t border-stone-200 pt-4 space-y-2.5 text-xs text-stone-600">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-semibold text-stone-900">${subtotalPrice.toLocaleString()} NZD</span>
+                  <span className="font-semibold text-stone-900">${subtotalPrice.toLocaleString()} USD</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>White-Glove Delivery</span>
+                  <span>Express Courier</span>
                   <span className="font-semibold text-stone-900">
-                    {shippingPrice === 0 ? 'Complimentary' : `$${shippingPrice.toLocaleString()} NZD`}
+                    {shippingPrice === 0 ? 'Complimentary' : `$${shippingPrice.toLocaleString()} USD`}
                   </span>
                 </div>
                 <div className="flex justify-between border-t border-stone-200 pt-3 text-base font-semibold text-stone-900">
-                  <span>Total Amount (incl. GST)</span>
-                  <span>${totalPrice.toLocaleString()} NZD</span>
+                  <span>Total Amount</span>
+                  <span>${totalPrice.toLocaleString()} USD</span>
                 </div>
               </div>
 
@@ -391,12 +377,12 @@ export default function CheckoutPage() {
                 disabled={isSubmitting}
                 className="w-full bg-stone-900 text-white py-4 text-xs uppercase tracking-[0.2em] font-medium hover:bg-stone-800 transition-colors flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
               >
-                {isSubmitting ? 'Commissioning Order...' : 'Confirm & Place Order'} <ArrowRight size={14} />
+                {isSubmitting ? 'Confirming Order...' : 'Confirm & Place Order'} <ArrowRight size={14} />
               </button>
 
               <div className="pt-2 text-center text-[10px] text-stone-500 space-y-1">
-                <p>✓ 10-Year Master Craftsman Structural Guarantee</p>
-                <p>✓ Insured nationwide transport directly from Nelson Workshop</p>
+                <p>✓ 100% Genuine Natural Fibers</p>
+                <p>✓ Complimentary 30-Day Returns & Size Exchanges</p>
               </div>
 
             </div>

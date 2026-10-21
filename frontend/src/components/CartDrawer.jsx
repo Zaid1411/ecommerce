@@ -24,7 +24,7 @@ export default function CartDrawer() {
     navigate('/checkout');
   };
 
-  const freeShippingThreshold = 3000;
+  const freeShippingThreshold = 300;
   const amountToFreeShipping = Math.max(0, freeShippingThreshold - subtotalPrice);
 
   return (
@@ -44,10 +44,10 @@ export default function CartDrawer() {
           <div className="p-6 border-b border-stone-200 flex items-center justify-between">
             <div>
               <h2 className="font-serif text-xl font-normal tracking-wide text-stone-900">
-                Your Bespoke Selection
+                Your Shopping Bag
               </h2>
               <p className="text-[11px] uppercase tracking-widest text-stone-500 mt-0.5">
-                {cartItems.length} {cartItems.length === 1 ? 'Handcrafted Piece' : 'Handcrafted Pieces'}
+                {cartItems.length} {cartItems.length === 1 ? 'Garment' : 'Garments'}
               </p>
             </div>
             <button
@@ -63,18 +63,18 @@ export default function CartDrawer() {
           <div className="bg-[#F4EFEA] px-6 py-3 border-b border-stone-200 text-xs text-stone-700">
             {amountToFreeShipping > 0 ? (
               <p className="flex items-center gap-1.5">
-                <Truck size={14} className="text-[#8C7355]" />
-                Add <span className="font-semibold text-stone-900">${amountToFreeShipping.toLocaleString()}</span> more for complimentary nationwide delivery.
+                <Truck size={14} className="text-stone-800" />
+                Add <span className="font-semibold text-stone-900">${amountToFreeShipping.toLocaleString()}</span> more for complimentary express delivery.
               </p>
             ) : (
               <p className="flex items-center gap-1.5 text-stone-900 font-medium">
-                <Truck size={14} className="text-[#8C7355]" />
-                Complimentary white-glove delivery unlocked!
+                <Truck size={14} className="text-stone-800" />
+                Complimentary express shipping unlocked!
               </p>
             )}
             <div className="w-full bg-stone-200 h-1 mt-2 rounded-full overflow-hidden">
               <div
-                className="bg-[#8C7355] h-full transition-all duration-500"
+                className="bg-stone-900 h-full transition-all duration-500"
                 style={{
                   width: `${Math.min(100, (subtotalPrice / freeShippingThreshold) * 100)}%`,
                 }}
@@ -86,9 +86,9 @@ export default function CartDrawer() {
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {cartItems.length === 0 ? (
               <div className="text-center py-16">
-                <p className="font-serif text-lg text-stone-600 mb-2">Your selection is empty</p>
+                <p className="font-serif text-lg text-stone-600 mb-2">Your shopping bag is empty</p>
                 <p className="text-xs text-stone-500 mb-6 max-w-xs mx-auto">
-                  Every Woodwright piece is made to order with sustainably harvested timbers and bespoke craftsmanship.
+                  Explore our seasonal drop of luxury shirts, pleated wool trousers, and cashmere outerwear.
                 </p>
                 <button
                   onClick={() => {
@@ -97,7 +97,7 @@ export default function CartDrawer() {
                   }}
                   className="inline-block bg-stone-900 text-stone-50 text-xs uppercase tracking-widest px-6 py-3 font-medium hover:bg-stone-800 transition-colors"
                 >
-                  Explore The Collection
+                  Explore Collection
                 </button>
               </div>
             ) : (
@@ -110,7 +110,7 @@ export default function CartDrawer() {
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-20 h-24 object-cover rounded-none bg-stone-100 flex-shrink-0"
+                    className="w-20 h-24 object-cover object-top rounded-none bg-stone-100 flex-shrink-0"
                   />
 
                   {/* Details */}
@@ -128,8 +128,8 @@ export default function CartDrawer() {
                           <Trash2 size={14} />
                         </button>
                       </div>
-                      <p className="text-[11px] text-[#8C7355] font-medium tracking-wide mt-1">
-                        Finish: {item.selectedFinish}
+                      <p className="text-[11px] text-stone-600 font-medium tracking-wide mt-1">
+                        Size: <span className="font-bold text-stone-900">{item.selectedSize}</span> · Color: {item.selectedColor}
                       </p>
                     </div>
 
@@ -174,14 +174,14 @@ export default function CartDrawer() {
                   <span className="font-medium text-stone-900">${subtotalPrice.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>White-Glove Delivery</span>
+                  <span>Express Delivery</span>
                   <span className="font-medium text-stone-900">
                     {shippingPrice === 0 ? 'Complimentary' : `$${shippingPrice.toLocaleString()}`}
                   </span>
                 </div>
                 <div className="flex justify-between border-t border-stone-100 pt-2 text-sm font-semibold text-stone-900">
-                  <span>Estimated Total (incl. GST)</span>
-                  <span>${totalPrice.toLocaleString()} NZD</span>
+                  <span>Estimated Total</span>
+                  <span>${totalPrice.toLocaleString()} USD</span>
                 </div>
               </div>
 
@@ -196,13 +196,13 @@ export default function CartDrawer() {
                   onClick={closeCart}
                   className="w-full text-center text-xs tracking-wider uppercase text-stone-600 hover:text-stone-900 py-1"
                 >
-                  Continue Selecting
+                  Continue Browsing
                 </button>
               </div>
 
               <div className="flex items-center justify-center gap-2 text-[10px] text-stone-500 pt-2">
-                <ShieldCheck size={14} className="text-[#8C7355]" />
-                <span>10-Year Master Craftsman Structural Warranty</span>
+                <ShieldCheck size={14} className="text-stone-800" />
+                <span>30-Day Complimentary Returns & Exchanges</span>
               </div>
             </div>
           )}

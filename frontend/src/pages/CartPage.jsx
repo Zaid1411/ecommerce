@@ -20,15 +20,15 @@ export default function CartPage() {
     return (
       <div className="bg-[#FAF8F5] min-h-[70vh] flex items-center justify-center py-20">
         <div className="max-w-md mx-auto text-center px-4">
-          <h1 className="font-serif text-3xl font-normal text-stone-900 mb-3">Your Bespoke Selection is Empty</h1>
+          <h1 className="font-serif text-3xl font-normal text-stone-900 mb-3">Your Shopping Bag is Empty</h1>
           <p className="text-xs text-stone-500 mb-8 leading-relaxed">
-            Every Woodwright piece is made to order with sustainably harvested timbers and bespoke craftsmanship.
+            Discover our luxury heavyweight Oxford shirts, pleated wool trousers, and cashmere overcoats.
           </p>
           <Link
             to="/shop"
             className="inline-block bg-stone-900 text-white px-8 py-4 text-xs uppercase tracking-[0.2em] font-medium hover:bg-stone-800 transition-colors shadow-md"
           >
-            Explore Handcrafted Collection
+            Explore Ready-to-Wear
           </Link>
         </div>
       </div>
@@ -41,13 +41,13 @@ export default function CartPage() {
         
         <div className="flex justify-between items-baseline mb-8 border-b border-stone-200 pb-4">
           <h1 className="font-serif text-3xl sm:text-4xl text-stone-900 font-normal">
-            Your Bespoke Selection
+            Your Shopping Bag
           </h1>
           <button
             onClick={clearCart}
             className="text-xs uppercase tracking-wider text-stone-500 hover:text-red-700 transition-colors"
           >
-            Clear Selection
+            Empty Bag
           </button>
         </div>
 
@@ -61,12 +61,14 @@ export default function CartPage() {
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-24 h-28 object-cover bg-stone-100 flex-shrink-0"
+                    className="w-24 h-28 object-cover object-top bg-stone-100 flex-shrink-0"
                   />
                   <div className="flex-1 space-y-1">
                     <h3 className="font-serif text-lg text-stone-900 font-normal">{item.name}</h3>
-                    <p className="text-xs text-[#8C7355] font-medium">Selected Finish: {item.selectedFinish}</p>
-                    <p className="text-xs text-stone-400">Unit Price: ${item.price.toLocaleString()} NZD</p>
+                    <p className="text-xs text-stone-700 font-medium">
+                      Size: <span className="font-bold text-stone-900">{item.selectedSize}</span> · Color: {item.selectedColor}
+                    </p>
+                    <p className="text-xs text-stone-400">Unit Price: ${item.price.toLocaleString()} USD</p>
                   </div>
 
                   {/* Quantity */}
@@ -89,7 +91,7 @@ export default function CartPage() {
                   {/* Total item price & delete */}
                   <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
                     <span className="text-base font-semibold text-stone-900">
-                      ${(item.price * item.quantity).toLocaleString()} NZD
+                      ${(item.price * item.quantity).toLocaleString()} USD
                     </span>
                     <button
                       onClick={() => removeFromCart(item.cartKey)}
@@ -104,9 +106,9 @@ export default function CartPage() {
             </div>
 
             <div className="bg-[#F4EFEA] p-4 border border-stone-200 flex items-center gap-3 text-xs text-stone-700">
-              <Truck size={18} className="text-[#8C7355] flex-shrink-0" />
+              <Truck size={18} className="text-stone-800 flex-shrink-0" />
               <span>
-                All orders are secured with dedicated, insured furniture transport and white-glove placement in your residence.
+                All orders are dispatched in bespoke recycled cardboard garment boxes with signature tissue wrapping and express tracking.
               </span>
             </div>
           </div>
@@ -121,17 +123,17 @@ export default function CartPage() {
               <div className="space-y-3 text-xs text-stone-600">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-semibold text-stone-900">${subtotalPrice.toLocaleString()} NZD</span>
+                  <span className="font-semibold text-stone-900">${subtotalPrice.toLocaleString()} USD</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>White-Glove Delivery</span>
+                  <span>Express Courier</span>
                   <span className="font-semibold text-stone-900">
-                    {shippingPrice === 0 ? 'Complimentary' : `$${shippingPrice.toLocaleString()} NZD`}
+                    {shippingPrice === 0 ? 'Complimentary' : `$${shippingPrice.toLocaleString()} USD`}
                   </span>
                 </div>
                 <div className="flex justify-between border-t border-stone-200 pt-3 text-sm font-semibold text-stone-900">
-                  <span>Estimated Total (incl. GST)</span>
-                  <span>${totalPrice.toLocaleString()} NZD</span>
+                  <span>Total Amount</span>
+                  <span>${totalPrice.toLocaleString()} USD</span>
                 </div>
               </div>
 
@@ -143,8 +145,8 @@ export default function CartPage() {
               </button>
 
               <div className="pt-2 flex items-center justify-center gap-2 text-[10px] text-stone-500">
-                <ShieldCheck size={14} className="text-[#8C7355]" />
-                <span>10-Year Master Craftsman Structural Warranty</span>
+                <ShieldCheck size={14} className="text-stone-800" />
+                <span>30-Day Complimentary Exchanges & Returns</span>
               </div>
             </div>
           </div>

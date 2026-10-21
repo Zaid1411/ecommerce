@@ -25,7 +25,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-stone-200 transition-all duration-300">
       {/* Top Editorial Announcement Bar */}
       <div className="bg-[#1C1917] text-[#FAF8F5] text-[11px] tracking-widest uppercase font-medium py-2 px-4 text-center border-b border-stone-800">
-        <span className="opacity-90">NZ Designed & Handcrafted • Timeless Architectural Furniture Built for Generations</span>
+        <span className="opacity-90">Autumn/Winter Ready-to-Wear Collection • Complimentary Express Delivery Over $300</span>
       </div>
 
       {/* Main Navigation Bar */}
@@ -46,30 +46,30 @@ export default function Navbar() {
           {/* Left: Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center space-x-8 text-[12px] tracking-[0.18em] uppercase font-medium text-stone-700">
             <Link to="/shop" className="hover:text-stone-900 transition-colors py-1 border-b border-transparent hover:border-stone-900">
-              All Furniture
+              All Apparel
             </Link>
-            <Link to="/shop?category=Living" className="hover:text-stone-900 transition-colors py-1 border-b border-transparent hover:border-stone-900">
-              Living
+            <Link to="/shop?category=Shirts" className="hover:text-stone-900 transition-colors py-1 border-b border-transparent hover:border-stone-900">
+              Shirts
             </Link>
-            <Link to="/shop?category=Dining" className="hover:text-stone-900 transition-colors py-1 border-b border-transparent hover:border-stone-900">
-              Dining
+            <Link to="/shop?category=Pants" className="hover:text-stone-900 transition-colors py-1 border-b border-transparent hover:border-stone-900">
+              Pants & Trousers
             </Link>
-            <Link to="/shop?category=Bedroom" className="hover:text-stone-900 transition-colors py-1 border-b border-transparent hover:border-stone-900">
-              Bedroom
+            <Link to="/shop?category=Outerwear" className="hover:text-stone-900 transition-colors py-1 border-b border-transparent hover:border-stone-900">
+              Outerwear
             </Link>
-            <Link to="/shop?category=Workspace" className="hover:text-stone-900 transition-colors py-1 border-b border-transparent hover:border-stone-900">
-              Workspace
+            <Link to="/shop?category=Knitwear" className="hover:text-stone-900 transition-colors py-1 border-b border-transparent hover:border-stone-900">
+              Knitwear
             </Link>
           </nav>
 
           {/* Center: Brand Wordmark */}
           <div className="flex-1 lg:flex-initial text-center lg:text-left">
             <Link to="/" className="inline-block group">
-              <span className="font-serif text-2xl sm:text-3xl tracking-[0.2em] font-normal text-stone-900 uppercase block group-hover:opacity-80 transition-opacity">
-                WOODWRIGHT
+              <span className="font-serif text-2xl sm:text-3xl tracking-[0.25em] font-normal text-stone-900 uppercase block group-hover:opacity-80 transition-opacity">
+                ATELIER
               </span>
               <span className="text-[9px] tracking-[0.3em] uppercase text-stone-500 font-sans block text-center">
-                Crafted in New Zealand
+                Modern Ready-to-Wear
               </span>
             </Link>
           </div>
@@ -106,14 +106,14 @@ export default function Navbar() {
                       className="flex items-center px-4 py-2 text-xs tracking-wider uppercase text-amber-800 hover:bg-stone-50 font-semibold"
                     >
                       <Shield size={14} className="mr-2" />
-                      Admin Studio
+                      Admin Dashboard
                     </Link>
                   )}
                   <Link
                     to="/profile"
                     className="block px-4 py-2 text-xs tracking-wider uppercase text-stone-700 hover:bg-stone-50"
                   >
-                    My Profile & Orders
+                    My Wardrobe & Orders
                   </Link>
                   <button
                     onClick={logout}
@@ -135,11 +135,11 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Shopping Cart Button */}
+            {/* Shopping Bag Button */}
             <button
               onClick={openCart}
               className="relative p-1 hover:text-stone-600 transition-colors flex items-center space-x-1.5"
-              aria-label="Shopping Cart"
+              aria-label="Shopping Bag"
             >
               <ShoppingBag size={21} strokeWidth={1.5} />
               {totalItems > 0 && (
@@ -157,7 +157,7 @@ export default function Navbar() {
             <form onSubmit={handleSearchSubmit} className="max-w-xl mx-auto flex items-center gap-3">
               <input
                 type="text"
-                placeholder="Search dining tables, bouclé chairs, walnut desks..."
+                placeholder="Search pleated trousers, oxford shirts, cashmere overcoats..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
@@ -189,35 +189,35 @@ export default function Navbar() {
             onClick={() => setMobileMenuOpen(false)}
             className="block text-sm tracking-widest uppercase font-medium text-stone-900"
           >
-            All Furniture
+            All Apparel
           </Link>
           <Link
-            to="/shop?category=Living"
+            to="/shop?category=Shirts"
             onClick={() => setMobileMenuOpen(false)}
             className="block text-sm tracking-widest uppercase font-medium text-stone-700"
           >
-            Living Collection
+            Shirts & Overshirts
           </Link>
           <Link
-            to="/shop?category=Dining"
+            to="/shop?category=Pants"
             onClick={() => setMobileMenuOpen(false)}
             className="block text-sm tracking-widest uppercase font-medium text-stone-700"
           >
-            Dining Collection
+            Pants & Trousers
           </Link>
           <Link
-            to="/shop?category=Bedroom"
+            to="/shop?category=Outerwear"
             onClick={() => setMobileMenuOpen(false)}
             className="block text-sm tracking-widest uppercase font-medium text-stone-700"
           >
-            Bedroom
+            Outerwear & Coats
           </Link>
           <Link
-            to="/shop?category=Workspace"
+            to="/shop?category=Knitwear"
             onClick={() => setMobileMenuOpen(false)}
             className="block text-sm tracking-widest uppercase font-medium text-stone-700"
           >
-            Workspace
+            Merino & Cashmere Knitwear
           </Link>
           {isAdmin && (
             <Link
@@ -225,7 +225,7 @@ export default function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="block text-sm tracking-widest uppercase font-bold text-amber-900 pt-2 border-t border-stone-200"
             >
-              Admin Dashboard
+              Admin Studio
             </Link>
           )}
         </div>

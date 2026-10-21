@@ -11,12 +11,12 @@ export default function ProductCard({ product }) {
     <div className="group flex flex-col justify-between bg-white border border-stone-200/70 hover:border-stone-400 transition-all duration-300">
       <div>
         {/* Product Image & Badges */}
-        <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
+        <div className="relative aspect-[3/4] overflow-hidden bg-stone-100">
           <Link to={`/product/${productId}`}>
             <img
               src={product.image || (product.images && product.images[0])}
               alt={product.name}
-              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+              className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
               loading="lazy"
             />
           </Link>
@@ -25,29 +25,29 @@ export default function ProductCard({ product }) {
           <div className="absolute top-3 left-3 flex flex-col gap-1.5 pointer-events-none">
             {product.isFeatured && (
               <span className="bg-[#1C1917]/90 text-[#FAF8F5] text-[9px] uppercase tracking-widest px-2.5 py-1 font-medium">
-                Featured
+                New Season
               </span>
             )}
-            {product.leadTime && (
+            {product.fabric && (
               <span className="bg-white/90 backdrop-blur-sm text-stone-800 text-[9px] uppercase tracking-wider px-2 py-0.5 border border-stone-200">
-                {product.leadTime}
+                {product.fabric.split(',')[0]}
               </span>
             )}
           </div>
 
           {/* Quick Hover Action Bar */}
-          <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
+          <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
             <Link
               to={`/product/${productId}`}
               className="bg-white/95 text-stone-900 text-xs px-3 py-2 uppercase tracking-wider font-medium hover:bg-stone-900 hover:text-white transition-colors flex items-center gap-1.5"
             >
-              <Eye size={13} /> View Piece
+              <Eye size={13} /> View Garment
             </Link>
             <button
-              onClick={() => addToCart(product, 1)}
+              onClick={() => addToCart(product, 1, product.defaultSize || 'M')}
               className="bg-stone-900 text-white text-xs px-3 py-2 uppercase tracking-wider font-medium hover:bg-stone-800 transition-colors flex items-center gap-1.5"
             >
-              <ShoppingBag size={13} /> Quick Add
+              <ShoppingBag size={13} /> Quick Add (M)
             </button>
           </div>
         </div>
@@ -71,21 +71,23 @@ export default function ProductCard({ product }) {
             </h3>
           </Link>
 
-          {product.timberFinish && (
-            <p className="text-xs text-[#8C7355] mt-1 font-medium truncate">
-              {product.timberFinish}
-            </p>
-          )}
+          {/* Color & Size Indicators */}
+          <div className="mt-1.5 flex items-center justify-between text-xs text-stone-500">
+            <span className="text-stone-600">{product.color || 'Standard Wash'}</span>
+            <span className="text-[10px] uppercase tracking-wider text-stone-400">
+              {(product.sizes || ['S', 'M', 'L', 'XL']).join(' · ')}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Price & Footnote */}
+      {/* Price & Stock */}
       <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-2 flex items-baseline justify-between border-t border-stone-100">
         <span className="text-sm sm:text-base font-semibold text-stone-900">
-          ${product.price.toLocaleString()} <span className="text-[10px] font-normal text-stone-500">NZD</span>
+          ${product.price.toLocaleString()} <span className="text-[10px] font-normal text-stone-500">USD</span>
         </span>
         <span className="text-[10px] text-stone-400 tracking-wider uppercase">
-          {product.countInStock > 0 ? 'Made to Order' : 'Sold Out'}
+          {product.countInStock > 0 ? 'In Stock' : 'Sold Out'}
         </span>
       </div>
     </div>

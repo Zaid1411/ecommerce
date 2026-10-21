@@ -31,9 +31,10 @@ export const CartProvider = ({ children }) => {
     }, 3500);
   };
 
-  const addToCart = (product, quantity = 1, selectedFinish = null) => {
-    const finish = selectedFinish || product.timberFinish || 'Standard Finish';
-    const itemKey = `${product.id || product._id}-${finish}`;
+  const addToCart = (product, quantity = 1, selectedSize = 'M', selectedColor = null) => {
+    const size = selectedSize || product.defaultSize || 'M';
+    const color = selectedColor || product.color || 'Standard';
+    const itemKey = `${product.id || product._id}-${size}-${color}`;
 
     setCartItems((prevItems) => {
       const existingIndex = prevItems.findIndex((item) => item.cartKey === itemKey);
@@ -58,14 +59,15 @@ export const CartProvider = ({ children }) => {
             price: product.price,
             image: product.image || (product.images && product.images[0]),
             countInStock: product.countInStock,
-            selectedFinish: finish,
+            selectedSize: size,
+            selectedColor: color,
             quantity,
           },
         ];
       }
     });
 
-    showNotification(`Added "${product.name}" (${finish}) to your bespoke selection.`);
+    showNotification(`Added "${product.name}" (Size ${size} · ${color}) to your shopping bag.`);
     setIsDrawerOpen(true);
   };
 
@@ -93,11 +95,11 @@ export const CartProvider = ({ children }) => {
     localStorage.removeItem('woodwright_cart');
   };
 
-  // Calculations
+  // Price Calculations (apparel free shipping over $300)
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const subtotalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const shippingPrice = subtotalPrice > 3000 || subtotalPrice === 0 ? 0 : 150;
-  const taxPrice = Math.round(subtotalPrice * 0.15); // 15% GST
+  const shippingPrice = subtotalPrice > 300 || subtotalPrice === 0 ? 0 : 25;
+  const taxPrice = Math.round(subtotalPrice * 0.08); // 8% sales tax
   const totalPrice = subtotalPrice + shippingPrice + taxPrice;
 
   return (

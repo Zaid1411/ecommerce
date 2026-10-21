@@ -25,23 +25,32 @@ export default function ProfilePage() {
         // Fallback demo orders for profile view
         setOrders([
           {
-            _id: 'NZ-WW-892104',
-            createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
-            status: 'In Workshop Handcrafted',
-            totalPrice: 3450,
+            _id: 'ATL-ORD-892104',
+            createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+            status: 'Dispatched via Express Courier',
+            totalPrice: 560,
             orderItems: [
               {
-                name: 'Otago Solid White Oak Dining Table',
+                name: 'Pleated Relaxed Wool Flannel Trousers',
                 qty: 1,
-                price: 3450,
-                selectedFinish: 'Natural American White Oak',
-                image: 'https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?q=80&w=400&auto=format&fit=crop'
+                price: 340,
+                selectedSize: 'M',
+                selectedColor: 'Charcoal Melange',
+                image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=400&auto=format&fit=crop'
+              },
+              {
+                name: 'Heavyweight Boxy Oxford Shirt',
+                qty: 1,
+                price: 220,
+                selectedSize: 'L',
+                selectedColor: 'Raw Ecru',
+                image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=400&auto=format&fit=crop'
               }
             ],
             shippingAddress: {
-              address: '22 Marine Parade',
-              city: 'Nelson',
-              country: 'New Zealand'
+              address: '742 Evergreen Terrace',
+              city: 'New York',
+              country: 'United States'
             }
           }
         ]);
@@ -84,7 +93,7 @@ export default function ProfilePage() {
                 to="/admin"
                 className="bg-amber-800 text-white px-5 py-2.5 text-xs uppercase tracking-wider font-medium hover:bg-amber-900 transition-colors"
               >
-                Open Admin Studio
+                Admin Studio
               </Link>
             )}
             <button
@@ -104,10 +113,10 @@ export default function ProfilePage() {
           <div className="border-b border-stone-200 pb-3 flex justify-between items-baseline">
             <h2 className="font-serif text-2xl font-normal text-stone-900 flex items-center gap-2">
               <Package size={22} className="text-[#8C7355]" />
-              Bespoke Order History
+              Wardrobe Order History
             </h2>
             <span className="text-xs text-stone-500">
-              {orders.length} {orders.length === 1 ? 'Commission' : 'Commissions'}
+              {orders.length} {orders.length === 1 ? 'Order' : 'Orders'}
             </span>
           </div>
 
@@ -121,7 +130,7 @@ export default function ProfilePage() {
             <div className="bg-white border border-stone-200 p-12 text-center">
               <p className="font-serif text-lg text-stone-800 mb-2">No orders placed yet</p>
               <p className="text-xs text-stone-500 mb-6">
-                When you commission custom handcrafted furniture, your progress tracking and delivery details will appear here.
+                When you order from ATELIER, your tracking details and order receipts will appear here.
               </p>
               <Link
                 to="/shop"
@@ -138,28 +147,28 @@ export default function ProfilePage() {
                   {/* Order Top Bar */}
                   <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-100 pb-4 text-xs text-stone-600">
                     <div className="space-y-1">
-                      <span className="text-[10px] uppercase tracking-wider text-stone-400 block">Commission Reference</span>
+                      <span className="text-[10px] uppercase tracking-wider text-stone-400 block">Order Number</span>
                       <span className="font-semibold text-stone-900 text-sm">#{order._id}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase tracking-wider text-stone-400 block">Date Placed</span>
                       <span className="font-medium text-stone-800">
-                        {new Date(order.createdAt).toLocaleDateString('en-NZ', { dateStyle: 'medium' })}
+                        {new Date(order.createdAt).toLocaleDateString('en-US', { dateStyle: 'medium' })}
                       </span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase tracking-wider text-stone-400 block">Status</span>
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 font-medium text-[11px]">
-                        <Clock size={12} /> {order.status || 'In Workshop Handcrafted'}
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-100 text-stone-900 border border-stone-300 font-medium text-[11px]">
+                        <Clock size={12} /> {order.status || 'Confirmed'}
                       </span>
                     </div>
 
                     <div className="space-y-1 sm:text-right">
                       <span className="text-[10px] uppercase tracking-wider text-stone-400 block">Total Investment</span>
                       <span className="font-semibold text-stone-900 text-sm">
-                        ${order.totalPrice.toLocaleString()} NZD
+                        ${order.totalPrice.toLocaleString()} USD
                       </span>
                     </div>
                   </div>
@@ -171,19 +180,19 @@ export default function ProfilePage() {
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="w-16 h-20 object-cover bg-stone-100 flex-shrink-0"
+                          className="w-16 h-20 object-cover object-top bg-stone-100 flex-shrink-0"
                         />
                         <div className="flex-1 text-xs">
                           <h4 className="font-serif text-base text-stone-900 font-normal">{item.name}</h4>
-                          <p className="text-[#8C7355] text-[11px] mt-0.5 font-medium">
-                            Finish: {item.selectedFinish || 'Standard Oak'}
+                          <p className="text-stone-600 text-[11px] mt-0.5 font-medium">
+                            Size: <span className="font-bold text-stone-900">{item.selectedSize || 'M'}</span> · Color: {item.selectedColor || 'Standard'}
                           </p>
                           <p className="text-stone-500 mt-1">
-                            Quantity: {item.qty} × ${item.price.toLocaleString()} NZD
+                            Quantity: {item.qty} × ${item.price.toLocaleString()} USD
                           </p>
                         </div>
                         <span className="text-sm font-semibold text-stone-900">
-                          ${(item.price * item.qty).toLocaleString()} NZD
+                          ${(item.price * item.qty).toLocaleString()} USD
                         </span>
                       </div>
                     ))}

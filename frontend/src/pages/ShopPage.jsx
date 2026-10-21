@@ -4,7 +4,7 @@ import { Filter, SlidersHorizontal, Search, RotateCcw, Check } from 'lucide-reac
 import ProductCard from '../components/ProductCard';
 import { productService } from '../services/api';
 
-const CATEGORIES = ['All', 'Living', 'Dining', 'Bedroom', 'Workspace'];
+const CATEGORIES = ['All', 'Shirts', 'Pants', 'Outerwear', 'Knitwear'];
 
 export default function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,7 +16,7 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [sortBy, setSortBy] = useState('featured');
-  const [maxPrice, setMaxPrice] = useState(5000);
+  const [maxPrice, setMaxPrice] = useState(1000);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -39,7 +39,7 @@ export default function ShopPage() {
         });
         setProducts(data.products || []);
       } catch (err) {
-        console.error('Failed to fetch products', err);
+        console.error('Failed to fetch garments', err);
       } finally {
         setLoading(false);
       }
@@ -86,7 +86,7 @@ export default function ShopPage() {
     setSelectedCategory('All');
     setSearchQuery('');
     setSortBy('featured');
-    setMaxPrice(5000);
+    setMaxPrice(1000);
     setInStockOnly(false);
     setSearchParams({});
   };
@@ -97,13 +97,13 @@ export default function ShopPage() {
       <div className="bg-[#1C1917] text-white py-14 sm:py-20 border-b border-stone-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-[11px] uppercase tracking-[0.25em] text-[#BBA28C] block mb-2 font-medium">
-            Handcrafted Catalog
+            Autumn / Winter Lookbook
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl font-normal tracking-tight">
-            Architectural Collection
+            Ready-to-Wear Collection
           </h1>
           <p className="max-w-xl mx-auto text-xs sm:text-sm text-stone-300 mt-3 font-light leading-relaxed">
-            Every piece is made to order in New Zealand with FSC certified solid hardwoods, hand-finished to your custom specification.
+            Essential Oxford shirts, pleated virgin wool trousers, selvedge denim, and cashmere overcoats designed with timeless proportions.
           </p>
         </div>
       </div>
@@ -138,9 +138,9 @@ export default function ShopPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-stone-50 border border-stone-300 px-3 py-1.5 text-xs text-stone-800 focus:outline-none focus:border-stone-800"
+                className="bg-stone-50 border border-stone-300 px-3 py-1.5 text-xs text-stone-800 focus:outline-none focus:border-stone-900"
               >
-                <option value="featured">Featured Pieces</option>
+                <option value="featured">Featured Garments</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
                 <option value="rating">Highest Rated</option>
@@ -177,20 +177,20 @@ export default function ShopPage() {
               {/* Price Range */}
               <div>
                 <label className="text-xs uppercase tracking-widest text-stone-700 font-semibold block mb-2">
-                  Maximum Price: ${maxPrice.toLocaleString()} NZD
+                  Maximum Price: ${maxPrice.toLocaleString()} USD
                 </label>
                 <input
                   type="range"
-                  min="1000"
-                  max="5000"
-                  step="250"
+                  min="150"
+                  max="1000"
+                  step="50"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
                   className="w-full accent-stone-900 cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-stone-400 mt-1">
-                  <span>$1,000</span>
-                  <span>$5,000+</span>
+                  <span>$150</span>
+                  <span>$1,000+</span>
                 </div>
               </div>
 
@@ -203,15 +203,15 @@ export default function ShopPage() {
                     onChange={(e) => setInStockOnly(e.target.checked)}
                     className="accent-stone-900 w-4 h-4 rounded-none"
                   />
-                  <span>Show Ready-to-Ship Pieces Only</span>
+                  <span>Show In-Stock Garments Only</span>
                 </label>
               </div>
 
-              {/* Timber Guarantee Box */}
+              {/* Tailoring Guarantee Box */}
               <div className="border-t border-stone-200 pt-4 text-xs text-stone-500 space-y-2">
-                <p className="font-medium text-stone-800">Custom Dimensions Available</p>
+                <p className="font-medium text-stone-800">Sizing & Tailoring Support</p>
                 <p className="text-[11px] leading-relaxed">
-                  Every table, desk, and credenza can be tailored to custom architectural room specifications upon request.
+                  Every trouser and shirt is cut with traditional seam allowances to facilitate tailored alterations by your local tailor.
                 </p>
               </div>
 
@@ -224,7 +224,7 @@ export default function ShopPage() {
             {/* Header info */}
             <div className="flex justify-between items-center mb-6 text-xs text-stone-600">
               <p>
-                Showing <span className="font-semibold text-stone-900">{filteredProducts.length}</span> handcrafted {filteredProducts.length === 1 ? 'piece' : 'pieces'}
+                Showing <span className="font-semibold text-stone-900">{filteredProducts.length}</span> luxury {filteredProducts.length === 1 ? 'garment' : 'garments'}
                 {searchQuery && (
                   <span> matching "<span className="italic font-medium">{searchQuery}</span>"</span>
                 )}
@@ -239,9 +239,9 @@ export default function ShopPage() {
               </div>
             ) : filteredProducts.length === 0 ? (
               <div className="bg-white border border-stone-200 p-12 text-center my-8">
-                <p className="font-serif text-xl text-stone-800 mb-2">No matching pieces found</p>
+                <p className="font-serif text-xl text-stone-800 mb-2">No matching garments found</p>
                 <p className="text-xs text-stone-500 mb-6 max-w-sm mx-auto">
-                  Try broadening your price range, clearing search terms, or exploring other room categories.
+                  Try broadening your price range, clearing search terms, or exploring other apparel categories.
                 </p>
                 <button
                   onClick={handleResetFilters}

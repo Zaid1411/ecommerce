@@ -27,17 +27,20 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState('');
 
-  // New product form state
+  // New garment form state
   const [newProduct, setNewProduct] = useState({
     name: '',
-    category: 'Dining',
-    price: 2500,
-    countInStock: 5,
-    leadTime: 'Handcrafted to order (4 weeks)',
-    timberFinish: 'Natural American White Oak',
-    image: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?q=80&w=1200&auto=format&fit=crop',
+    category: 'Shirts',
+    price: 240,
+    countInStock: 25,
+    leadTime: 'In Stock - Dispatches in 24h',
+    color: 'Midnight Navy',
+    fabric: '100% Organic Combed Cotton',
+    defaultSize: 'M',
+    sizes: ['S', 'M', 'L', 'XL'],
+    image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1200&auto=format&fit=crop',
     description: '',
-    dimensions: '2000mm L x 950mm W x 750mm H',
+    fit: 'Relaxed contemporary silhouette.',
   });
 
   useEffect(() => {
@@ -54,20 +57,20 @@ export default function AdminPage() {
           // Demo fallback orders
           setOrders([
             {
-              _id: 'NZ-WW-109482',
-              user: { name: 'Sarah Jenkins', email: 'sarah.j@nzarchitects.co.nz' },
-              totalPrice: 5300,
+              _id: 'ATL-ORD-902144',
+              user: { name: 'Julian Vance', email: 'julian.vance@studio.com' },
+              totalPrice: 560,
               createdAt: new Date().toISOString(),
-              status: 'In Workshop Handcrafted',
-              orderItems: [{ name: 'Otago Solid White Oak Dining Table', qty: 1 }],
+              status: 'Preparing Dispatch',
+              orderItems: [{ name: 'Pleated Relaxed Wool Flannel Trousers', qty: 1, selectedSize: 'M' }],
             },
             {
-              _id: 'NZ-WW-109481',
-              user: { name: 'Marcus Sterling', email: 'marcus@studioalmond.nz' },
-              totalPrice: 3700,
+              _id: 'ATL-ORD-902143',
+              user: { name: 'Elena Rostova', email: 'elena@fashionarchive.com' },
+              totalPrice: 890,
               createdAt: new Date(Date.now() - 86400000).toISOString(),
               status: 'Dispatched',
-              orderItems: [{ name: 'Fiordland Bouclé Lounge Chair', qty: 2 }],
+              orderItems: [{ name: 'Double-Breasted Cashmere Blend Overcoat', qty: 1, selectedSize: 'S' }],
             },
           ]);
         }
@@ -87,14 +90,14 @@ export default function AdminPage() {
 
   // Delete product handler
   const handleDeleteProduct = async (id) => {
-    if (window.confirm('Are you sure you want to remove this piece from the catalog?')) {
+    if (window.confirm('Are you sure you want to remove this garment from the storefront?')) {
       try {
         await productService.delete(id);
       } catch (e) {
         console.warn('Backend delete unavailable, removing from local state');
       }
       setProducts((prev) => prev.filter((p) => (p.id || p._id) !== id));
-      triggerNotification('Piece removed from catalog successfully.');
+      triggerNotification('Garment removed from catalog.');
     }
   };
 
@@ -103,7 +106,7 @@ export default function AdminPage() {
     setProducts((prev) =>
       prev.map((p) => ((p.id || p._id) === id ? { ...p, countInStock: Math.max(0, newStock) } : p))
     );
-    triggerNotification('Stock inventory updated.');
+    triggerNotification('Warehouse stock updated.');
   };
 
   // Order status update
@@ -134,18 +137,21 @@ export default function AdminPage() {
         };
       }
       setProducts([created, ...products]);
-      triggerNotification(`New handcrafted piece "${newProduct.name}" published!`);
+      triggerNotification(`New garment "${newProduct.name}" published!`);
       setActiveTab('products');
       setNewProduct({
         name: '',
-        category: 'Dining',
-        price: 2500,
-        countInStock: 5,
-        leadTime: 'Handcrafted to order (4 weeks)',
-        timberFinish: 'Natural American White Oak',
-        image: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?q=80&w=1200&auto=format&fit=crop',
+        category: 'Shirts',
+        price: 240,
+        countInStock: 25,
+        leadTime: 'In Stock - Dispatches in 24h',
+        color: 'Midnight Navy',
+        fabric: '100% Organic Combed Cotton',
+        defaultSize: 'M',
+        sizes: ['S', 'M', 'L', 'XL'],
+        image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1200&auto=format&fit=crop',
         description: '',
-        dimensions: '2000mm L x 950mm W x 750mm H',
+        fit: 'Relaxed contemporary silhouette.',
       });
     } catch (err) {
       alert('Error creating piece: ' + err.message);
@@ -162,14 +168,14 @@ export default function AdminPage() {
           </div>
           <h1 className="font-serif text-2xl text-stone-900 font-normal">Restricted Admin Studio</h1>
           <p className="text-xs text-stone-600 leading-relaxed font-light">
-            You must be logged in as an authorized Woodwright Administrator to access inventory, manage catalog pieces, and update client commissions.
+            You must be logged in as an authorized ATELIER Administrator to manage catalog inventory and client orders.
           </p>
           <div className="pt-2">
             <Link
               to="/login"
               className="inline-block bg-stone-900 text-white px-6 py-3 text-xs uppercase tracking-widest font-medium hover:bg-stone-800"
             >
-              Sign In As Admin (Use Quick Demo Button)
+              Sign In As Admin (Quick Demo Button)
             </Link>
           </div>
         </div>
@@ -191,14 +197,14 @@ export default function AdminPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="font-serif text-3xl sm:text-4xl font-normal text-stone-900">
-                Nelson Workshop Studio
+                Atelier Fashion Studio
               </span>
               <span className="bg-amber-100 text-amber-900 border border-amber-300 text-[10px] uppercase font-semibold px-2 py-0.5 tracking-wider">
                 Admin Console
               </span>
             </div>
             <p className="text-xs text-stone-500 mt-1">
-              Logged in as {user.name} ({user.email}) • Real-time inventory & commission management
+              Logged in as {user.name} ({user.email}) • Real-time warehouse inventory & client orders
             </p>
           </div>
 
@@ -206,7 +212,7 @@ export default function AdminPage() {
             onClick={() => setActiveTab('new-product')}
             className="self-start sm:self-auto bg-stone-900 text-white px-5 py-2.5 text-xs uppercase tracking-widest font-medium hover:bg-stone-800 transition-colors flex items-center gap-1.5 shadow-sm"
           >
-            <Plus size={15} /> Commission New Piece
+            <Plus size={15} /> Publish New Garment
           </button>
         </div>
 
@@ -221,27 +227,27 @@ export default function AdminPage() {
         {/* 4 Metric KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <div className="bg-white border border-stone-200 p-5 space-y-1">
-            <span className="text-[10px] uppercase tracking-wider text-stone-500">Gross Commissions</span>
-            <p className="font-serif text-2xl text-stone-900 font-semibold">${totalRevenue.toLocaleString()} NZD</p>
+            <span className="text-[10px] uppercase tracking-wider text-stone-500">Gross Sales</span>
+            <p className="font-serif text-2xl text-stone-900 font-semibold">${totalRevenue.toLocaleString()} USD</p>
             <span className="text-[10px] text-emerald-700 font-medium">Across {orders.length} orders</span>
           </div>
 
           <div className="bg-white border border-stone-200 p-5 space-y-1">
-            <span className="text-[10px] uppercase tracking-wider text-stone-500">Active Pieces in Archive</span>
+            <span className="text-[10px] uppercase tracking-wider text-stone-500">Active Garments</span>
             <p className="font-serif text-2xl text-stone-900 font-semibold">{products.length}</p>
-            <span className="text-[10px] text-stone-500">Bespoke catalog lines</span>
+            <span className="text-[10px] text-stone-500">Ready-to-wear lines</span>
           </div>
 
           <div className="bg-white border border-stone-200 p-5 space-y-1">
-            <span className="text-[10px] uppercase tracking-wider text-stone-500">Total Workshop Stock</span>
+            <span className="text-[10px] uppercase tracking-wider text-stone-500">Warehouse Stock</span>
             <p className="font-serif text-2xl text-stone-900 font-semibold">{totalStockCount}</p>
             <span className="text-[10px] text-stone-500">Units in inventory</span>
           </div>
 
           <div className="bg-white border border-stone-200 p-5 space-y-1">
-            <span className="text-[10px] uppercase tracking-wider text-stone-500">Low Stock Attention</span>
+            <span className="text-[10px] uppercase tracking-wider text-stone-500">Low Stock Alert</span>
             <p className="font-serif text-2xl text-amber-800 font-semibold">{lowStockCount}</p>
-            <span className="text-[10px] text-amber-700">Pieces below 5 units</span>
+            <span className="text-[10px] text-amber-700">Garments below 5 units</span>
           </div>
         </div>
 
@@ -261,7 +267,7 @@ export default function AdminPage() {
               activeTab === 'orders' ? 'border-stone-900 text-stone-900' : 'border-transparent text-stone-400 hover:text-stone-700'
             }`}
           >
-            Commission Orders ({orders.length})
+            Client Orders ({orders.length})
           </button>
           <button
             onClick={() => setActiveTab('new-product')}
@@ -269,7 +275,7 @@ export default function AdminPage() {
               activeTab === 'new-product' ? 'border-stone-900 text-stone-900' : 'border-transparent text-stone-400 hover:text-stone-700'
             }`}
           >
-            + Create New Piece
+            + Create New Garment
           </button>
         </div>
 
@@ -279,11 +285,11 @@ export default function AdminPage() {
             <table className="w-full text-left text-xs text-stone-700">
               <thead className="bg-[#FAF8F5] text-[10px] uppercase tracking-wider text-stone-500 border-b border-stone-200">
                 <tr>
-                  <th className="p-4">Piece</th>
+                  <th className="p-4">Garment</th>
                   <th className="p-4">Category</th>
                   <th className="p-4">Price</th>
-                  <th className="p-4">Inventory Units</th>
-                  <th className="p-4">Timber Finish</th>
+                  <th className="p-4">Warehouse Units</th>
+                  <th className="p-4">Fabric / Color</th>
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -296,7 +302,7 @@ export default function AdminPage() {
                         <img
                           src={p.image || (p.images && p.images[0])}
                           alt={p.name}
-                          className="w-12 h-14 object-cover bg-stone-100 flex-shrink-0"
+                          className="w-12 h-14 object-cover object-top bg-stone-100 flex-shrink-0"
                         />
                         <div>
                           <p className="font-serif text-sm text-stone-900 font-medium">{p.name}</p>
@@ -304,7 +310,7 @@ export default function AdminPage() {
                         </div>
                       </td>
                       <td className="p-4">{p.category}</td>
-                      <td className="p-4 font-semibold text-stone-900">${p.price.toLocaleString()} NZD</td>
+                      <td className="p-4 font-semibold text-stone-900">${p.price.toLocaleString()} USD</td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <input
@@ -319,7 +325,7 @@ export default function AdminPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="p-4 text-[#8C7355] text-xs font-medium">{p.timberFinish || 'Standard Oak'}</td>
+                      <td className="p-4 text-stone-600 text-xs font-medium">{p.color || 'Standard'}</td>
                       <td className="p-4 text-right space-x-2">
                         <Link
                           to={`/product/${pId}`}
@@ -331,7 +337,7 @@ export default function AdminPage() {
                         <button
                           onClick={() => handleDeleteProduct(pId)}
                           className="p-1 text-stone-400 hover:text-red-700 transition-colors"
-                          title="Delete Piece"
+                          title="Delete Garment"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -350,11 +356,11 @@ export default function AdminPage() {
             <table className="w-full text-left text-xs text-stone-700">
               <thead className="bg-[#FAF8F5] text-[10px] uppercase tracking-wider text-stone-500 border-b border-stone-200">
                 <tr>
-                  <th className="p-4">Commission ID</th>
-                  <th className="p-4">Client</th>
-                  <th className="p-4">Date Commissioned</th>
+                  <th className="p-4">Order ID</th>
+                  <th className="p-4">Customer</th>
+                  <th className="p-4">Date</th>
                   <th className="p-4">Total Amount</th>
-                  <th className="p-4">Workshop Status</th>
+                  <th className="p-4">Fulfillment Status</th>
                   <th className="p-4">Status Update</th>
                 </tr>
               </thead>
@@ -367,22 +373,22 @@ export default function AdminPage() {
                       <p className="text-[10px] text-stone-400">{o.user?.email || o.shippingAddress?.email || 'N/A'}</p>
                     </td>
                     <td className="p-4 text-stone-500">
-                      {new Date(o.createdAt).toLocaleDateString('en-NZ', { dateStyle: 'medium' })}
+                      {new Date(o.createdAt).toLocaleDateString('en-US', { dateStyle: 'medium' })}
                     </td>
-                    <td className="p-4 font-semibold text-stone-900">${o.totalPrice.toLocaleString()} NZD</td>
+                    <td className="p-4 font-semibold text-stone-900">${o.totalPrice.toLocaleString()} USD</td>
                     <td className="p-4">
-                      <span className="inline-block px-2.5 py-1 text-[10px] uppercase tracking-wider font-semibold bg-amber-50 text-amber-900 border border-amber-200">
-                        {o.status || 'In Workshop'}
+                      <span className="inline-block px-2.5 py-1 text-[10px] uppercase tracking-wider font-semibold bg-stone-100 text-stone-900 border border-stone-300">
+                        {o.status || 'Confirmed'}
                       </span>
                     </td>
                     <td className="p-4">
                       <select
-                        value={o.status || 'In Workshop Handcrafted'}
+                        value={o.status || 'Confirmed'}
                         onChange={(e) => handleOrderStatusChange(o._id, e.target.value)}
                         className="border border-stone-300 bg-white px-2 py-1 text-xs focus:outline-none focus:border-stone-900"
                       >
-                        <option value="In Workshop Handcrafted">In Workshop Handcrafted</option>
-                        <option value="Quality Inspection Passed">Quality Inspection Passed</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Preparing Dispatch">Preparing Dispatch</option>
                         <option value="Dispatched">Dispatched</option>
                         <option value="Delivered">Delivered</option>
                       </select>
@@ -398,19 +404,19 @@ export default function AdminPage() {
         {activeTab === 'new-product' && (
           <div className="bg-white border border-stone-200 p-8 max-w-3xl shadow-sm">
             <h2 className="font-serif text-2xl font-normal text-stone-900 border-b border-stone-200 pb-3 mb-6">
-              Commission & Publish a New Piece
+              Publish a New Ready-to-Wear Garment
             </h2>
 
             <form onSubmit={handleCreateProductSubmit} className="space-y-5 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
-                    Piece Name *
+                    Garment Name *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Tasman Solid Oak Credenza"
+                    placeholder="e.g. Pleated Wool Chino Trousers"
                     value={newProduct.name}
                     onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                     className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
@@ -419,17 +425,17 @@ export default function AdminPage() {
 
                 <div>
                   <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
-                    Architectural Room Category *
+                    Wardrobe Category *
                   </label>
                   <select
                     value={newProduct.category}
                     onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
                     className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
                   >
-                    <option value="Living">Living</option>
-                    <option value="Dining">Dining</option>
-                    <option value="Bedroom">Bedroom</option>
-                    <option value="Workspace">Workspace</option>
+                    <option value="Shirts">Shirts</option>
+                    <option value="Pants">Pants</option>
+                    <option value="Outerwear">Outerwear</option>
+                    <option value="Knitwear">Knitwear</option>
                   </select>
                 </div>
               </div>
@@ -437,11 +443,11 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
-                    Price (NZD) *
+                    Price (USD) *
                   </label>
                   <input
                     type="number"
-                    min="100"
+                    min="10"
                     required
                     value={newProduct.price}
                     onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
@@ -465,7 +471,7 @@ export default function AdminPage() {
 
                 <div>
                   <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
-                    Lead Time
+                    Lead Time / Shipping
                   </label>
                   <input
                     type="text"
@@ -478,7 +484,7 @@ export default function AdminPage() {
 
               <div>
                 <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
-                  High-Resolution Image URL *
+                  High-Resolution Model Image URL *
                 </label>
                 <input
                   type="url"
@@ -489,29 +495,46 @@ export default function AdminPage() {
                 />
               </div>
 
-              <div>
-                <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
-                  Timber Finish & Species *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newProduct.timberFinish}
-                  onChange={(e) => setNewProduct({ ...newProduct, timberFinish: e.target.value })}
-                  className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
+                    Colorway *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Charcoal Melange"
+                    value={newProduct.color}
+                    onChange={(e) => setNewProduct({ ...newProduct, color: e.target.value })}
+                    className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
+                    Fabric Composition *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 100% Super 120s Italian Virgin Wool"
+                    value={newProduct.fabric}
+                    onChange={(e) => setNewProduct({ ...newProduct, fabric: e.target.value })}
+                    className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
+                  />
+                </div>
               </div>
 
               <div>
                 <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
-                  Architectural Description & Joinery Details
+                  Garment Description & Mill Provenance
                 </label>
                 <textarea
                   rows="3"
                   required
                   value={newProduct.description}
                   onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                  placeholder="Describe timber grain, mortise-and-tenon joints, organic wax finishes..."
+                  placeholder="Describe silhouette, drape, horn buttons, weave texture..."
                   className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
                 />
               </div>
@@ -528,7 +551,7 @@ export default function AdminPage() {
                   type="submit"
                   className="bg-stone-900 text-white px-8 py-2.5 uppercase tracking-widest font-medium hover:bg-stone-800 shadow-sm"
                 >
-                  Publish Piece to Storefront
+                  Publish Garment
                 </button>
               </div>
             </form>
