@@ -1,0 +1,20 @@
+{
+  "name": "shop-ecommerce",
+  "version": "1.0.0",
+  "description": "Full Stack Luxury E-Commerce Platform inspired by Woodwrights",
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build:frontend": "npm --prefix frontend run build"
+  },
+  "keywords": [
+    "react",
+    "vite",
+    "tailwind",
+    "express",
+    "mongodb",
+    "ecommerce"
+  ],
+  "author": "Muhammed Zaid",
+  "license": "MIT"
+}
