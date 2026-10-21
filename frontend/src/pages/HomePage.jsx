@@ -77,7 +77,7 @@ export default function HomePage() {
           >
             <div className="relative aspect-[4/5] overflow-hidden bg-[#F0EEE9] shadow-sm">
               <img
-                src="/assets/prod_shirt_oxford.jpg"
+                src="/assets/campaign_shirt_edit.jpg"
                 alt="The Shirt Edit - Heavyweight Oxfords & French Linen"
                 className="w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-700 ease-out"
               />
@@ -108,7 +108,7 @@ export default function HomePage() {
           >
             <div className="relative aspect-[4/5] overflow-hidden bg-[#F0EEE9] shadow-sm">
               <img
-                src="/assets/prod_pants_pleated.jpg"
+                src="/assets/campaign_trousers_edit.jpg"
                 alt="Tailored Pants and Italian Wool Trousers"
                 className="w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-700 ease-out"
               />
@@ -176,7 +176,7 @@ export default function HomePage() {
             
             <div className="lg:col-span-6 aspect-[4/5] bg-[#F0EEE9] overflow-hidden shadow-sm">
               <img
-                src="/assets/prod_jacket_harrington.jpg"
+                src="/assets/campaign_craft_twill.jpg"
                 alt="Structured Cotton Twill Overshirt Editorial"
                 className="w-full h-full object-cover object-center"
               />
