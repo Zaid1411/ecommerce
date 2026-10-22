@@ -4,14 +4,18 @@ import { ShoppingBag, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 export default function ProductCard({ product }) {
-  const { addToCart } = useCart();
+  const { addToCart, showNotification } = useCart();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const productId = product.id || product._id;
 
   const toggleWishlist = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
+    const next = !isWishlisted;
+    setIsWishlisted(next);
+    if (showNotification) {
+      showNotification(next ? `Saved "${product.name}" to private wardrobe wishlist.` : `Removed from wishlist.`);
+    }
   };
 
   return (
@@ -95,11 +99,16 @@ export default function ProductCard({ product }) {
           </span>
 
           {/* Sizes Available */}
-          <div className="flex items-center gap-1.5 text-[10px] text-stone-400 font-medium">
+          <div className="flex items-center gap-1 text-[10px] text-stone-500 font-medium">
             {(product.sizes || ['S', 'M', 'L', 'XL']).map((s) => (
-              <span key={s} className="hover:text-stone-900 transition-colors cursor-default">
+              <Link
+                key={s}
+                to={`/product/${productId}?size=${s}`}
+                className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center border border-stone-200 bg-white hover:border-stone-900 hover:bg-stone-900 hover:text-white transition-all text-[9px] sm:text-[10px] font-semibold cursor-pointer shadow-2xs"
+                title={`View ${product.name} in size ${s}`}
+              >
                 {s}
-              </span>
+              </Link>
             ))}
           </div>
         </div>

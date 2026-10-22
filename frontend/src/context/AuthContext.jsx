@@ -7,7 +7,17 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('woodwright_user');
-      return saved ? JSON.parse(saved) : null;
+      if (!saved) return null;
+      const parsed = JSON.parse(saved);
+      // Migrate legacy "Editorial Director" name to "Studio Director"
+      if (parsed.name === 'Editorial Director') {
+        parsed.name = 'Studio Director';
+        if (parsed.email === 'admin@woodwright.co.nz') {
+          parsed.email = 'admin@atelier.com';
+        }
+        localStorage.setItem('woodwright_user', JSON.stringify(parsed));
+      }
+      return parsed;
     } catch (err) {
       console.error('Failed to parse user from localStorage', err);
       return null;
@@ -35,11 +45,14 @@ export const AuthProvider = ({ children }) => {
       return data;
     } catch (err) {
       // Fallback demo login for offline testing if backend is not yet populated
-      if (email === 'admin@woodwright.co.nz' && password === 'admin123') {
+      if (
+        (email === 'admin@atelier.com' || email === 'admin@woodwright.co.nz') &&
+        (password === 'admin123' || password === 'admin')
+      ) {
         const demoAdmin = {
           _id: 'mock-admin-01',
-          name: 'Editorial Director',
-          email: 'admin@woodwright.co.nz',
+          name: 'Studio Director',
+          email: 'admin@atelier.com',
           isAdmin: true,
           token: 'mock-jwt-admin-token-749210',
         };
@@ -75,11 +88,29 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       return data;
     } catch (err) {
+      // In fallback mode, reject duplicate emails
+      const normalizedEmail = email.toLowerCase().trim();
+      const existingKnownEmails = ['admin@atelier.com', 'admin@woodwright.co.nz', 'client@example.com'];
+      const savedUser = localStorage.getItem('woodwright_user');
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser);
+          if (parsed.email) existingKnownEmails.push(parsed.email.toLowerCase().trim());
+        } catch (e) {}
+      }
+
+      if (existingKnownEmails.includes(normalizedEmail)) {
+        const msg = 'An account with this email address already exists. Please sign in instead.';
+        setError(msg);
+        setLoading(false);
+        throw new Error(msg);
+      }
+
       // Fallback demo registration
       const newMockUser = {
         _id: `user-${Date.now()}`,
         name,
-        email,
+        email: normalizedEmail,
         isAdmin: false,
         token: `mock-token-${Date.now()}`,
       };

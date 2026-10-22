@@ -14,7 +14,11 @@
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, .font-serif {
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-serif {
     font-family: 'Playfair Display', Georgia, serif;
   }
 }

@@ -1,0 +1,54 @@
+services:
+  # -------------------------------------------------------------
+  # 1. ATELIER Express API Backend (Render Web Service)
+  # -------------------------------------------------------------
+  - type: web
+    name: atelier-api
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5001
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: atelier-frontend
+          property: host
+      # Fill in with your Stripe credentials in the Render Dashboard
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+
+  # -------------------------------------------------------------
+  # 2. ATELIER React Frontend (Render Static Site)
+  # -------------------------------------------------------------
+  - type: web
+    name: atelier-frontend
+    env: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    routes:
+      # Client-Side Routing Rewrite (prevents 404 on page refresh)
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: atelier-api
+          property: host
+          format: https://{host}/api

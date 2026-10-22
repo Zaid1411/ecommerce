@@ -5,7 +5,7 @@ const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
     try {
-      const saved = localStorage.getItem('woodwright_cart');
+      const saved = localStorage.getItem('atelier_cart') || localStorage.getItem('woodwright_cart');
       return saved ? JSON.parse(saved) : [];
     } catch (err) {
       console.error('Failed to parse cart from storage', err);
@@ -18,7 +18,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('woodwright_cart', JSON.stringify(cartItems));
+      localStorage.setItem('atelier_cart', JSON.stringify(cartItems));
     } catch (err) {
       console.error('Failed to save cart to storage', err);
     }
@@ -92,6 +92,7 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setCartItems([]);
+    localStorage.removeItem('atelier_cart');
     localStorage.removeItem('woodwright_cart');
   };
 
@@ -120,6 +121,7 @@ export const CartProvider = ({ children }) => {
         taxPrice,
         totalPrice,
         notification,
+        showNotification,
       }}
     >
       {children}

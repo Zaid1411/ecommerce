@@ -1,7 +1,18 @@
 import axios from 'axios';
 import { MOCK_PRODUCTS } from '../data/mockProducts';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+const getApiBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) {
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+      return `${window.location.origin}/api`;
+    }
+    return 'http://localhost:5001/api';
+  }
+  return envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/+$/, '')}/api`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -157,6 +168,46 @@ export const orderService = {
 
   updateStatus: async (id, status) => {
     const response = await api.put(`/orders/${id}/status`, { status });
+    return response.data;
+  },
+};
+
+// Payment & Stripe Service
+export const paymentService = {
+  getConfig: async () => {
+    try {
+      const response = await api.get('/payment/config');
+      return response.data;
+    } catch (err) {
+      console.warn('Backend payment config endpoint unavailable:', err.message);
+      return {
+        publishableKey: '',
+        stripeConfigured: false,
+        currency: 'usd',
+        sandboxMode: true,
+      };
+    }
+  },
+
+  createPaymentIntent: async (payload) => {
+    try {
+      const response = await api.post('/payment/create-payment-intent', payload);
+      return response.data;
+    } catch (err) {
+      console.warn('Backend createPaymentIntent unavailable, using local simulated intent:', err.message);
+      return {
+        clientSecret: `pi_test_${Date.now()}_secret_${Math.random().toString(36).substring(2, 9)}`,
+        paymentIntentId: `pi_test_${Date.now()}`,
+        amount: payload.amount,
+        currency: payload.currency || 'usd',
+        sandboxMode: true,
+        isLive: false,
+      };
+    }
+  },
+
+  verifyPayment: async (payload) => {
+    const response = await api.post('/payment/verify-payment', payload);
     return response.data;
   },
 };

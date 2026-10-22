@@ -29,7 +29,7 @@ export default function LoginPage() {
   };
 
   const handleQuickFillAdmin = () => {
-    setEmail('admin@woodwright.co.nz');
+    setEmail('admin@atelier.com');
     setPassword('admin123');
   };
 
@@ -48,7 +48,7 @@ export default function LoginPage() {
           </span>
           <h1 className="font-serif text-3xl font-normal text-stone-900">Sign In to Your Account</h1>
           <p className="text-xs text-stone-500 font-light">
-            Access your bespoke orders, timber commissions, and delivery schedules.
+            Access your bespoke orders, private garment fittings, and delivery schedules.
           </p>
         </div>
 

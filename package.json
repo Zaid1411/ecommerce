@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "description": "Full Stack Luxury E-Commerce Platform inspired by Woodwrights",
   "scripts": {
+    "build": "npm --prefix frontend run build",
+    "build:frontend": "npm --prefix frontend run build",
+    "start": "npm --prefix backend start",
     "dev:frontend": "npm --prefix frontend run dev",
-    "dev:backend": "npm --prefix backend run dev",
-    "build:frontend": "npm --prefix frontend run build"
+    "dev:backend": "npm --prefix backend run dev"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "keywords": [
     "react",

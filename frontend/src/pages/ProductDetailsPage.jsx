@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Star, ShieldCheck, Truck, Check, ArrowRight, Plus, Minus, Scissors, Sparkles, Heart } from 'lucide-react';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Star, ShieldCheck, Truck, Check, ArrowRight, Plus, Minus, Scissors, Sparkles, Heart, Ruler, X, Info } from 'lucide-react';
 import { productService } from '../services/api';
 import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ProductCard';
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, showNotification } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,6 +21,9 @@ export default function ProductDetailsPage() {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [addedAnimation, setAddedAnimation] = useState(false);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [sizeUnit, setSizeUnit] = useState('inches'); // 'inches' | 'cm'
+  const [trustModal, setTrustModal] = useState(null);
 
   useEffect(() => {
     async function loadProduct() {
@@ -28,7 +32,13 @@ export default function ProductDetailsPage() {
         const data = await productService.getById(id);
         setProduct(data);
         setSelectedImage(data.image || (data.images && data.images[0]));
-        setSelectedSize(data.defaultSize || (data.sizes && data.sizes[0]) || 'M');
+        const requestedSize = searchParams.get('size');
+        const availableSizes = data.sizes || ['S', 'M', 'L', 'XL'];
+        if (requestedSize && availableSizes.includes(requestedSize)) {
+          setSelectedSize(requestedSize);
+        } else {
+          setSelectedSize(data.defaultSize || availableSizes[0] || 'M');
+        }
         setSelectedColor(data.color || (data.colors && data.colors[0]) || 'Standard');
         
         // Load related
@@ -128,8 +138,14 @@ export default function ProductDetailsPage() {
 
                 {/* Wishlist Button */}
                 <button
-                  onClick={() => setIsWishlisted(!isWishlisted)}
-                  className="absolute top-4 right-4 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white text-stone-700 hover:text-stone-900 transition-all shadow-sm focus:outline-none"
+                  onClick={() => {
+                    const next = !isWishlisted;
+                    setIsWishlisted(next);
+                    if (showNotification) {
+                      showNotification(next ? `Saved "${product.name}" to private wardrobe wishlist.` : `Removed from wishlist.`);
+                    }
+                  }}
+                  className="absolute top-4 right-4 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white text-stone-700 hover:text-stone-900 transition-all shadow-sm focus:outline-none cursor-pointer"
                   aria-label="Wishlist toggle"
                 >
                   <Heart
@@ -220,9 +236,15 @@ export default function ProductDetailsPage() {
                   <label className="text-xs uppercase tracking-widest text-stone-700 font-semibold">
                     Select Size: <span className="font-bold text-stone-900">{selectedSize}</span>
                   </label>
-                  <span className="text-[11px] text-stone-500 hover:text-stone-900 underline cursor-pointer">
-                    Size Guide
-                  </span>
+                  <button
+                    id="size-guide-btn"
+                    type="button"
+                    onClick={() => setSizeGuideOpen(true)}
+                    className="text-[11px] text-stone-600 hover:text-stone-900 underline flex items-center gap-1 font-medium transition-colors cursor-pointer"
+                  >
+                    <Ruler size={13} />
+                    <span>Size Guide</span>
+                  </button>
                 </div>
                 <div className="flex gap-2.5">
                   {sizes.map((s) => (
@@ -291,23 +313,47 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
 
-              {/* Trust Badges */}
+              {/* Interactive Trust Badges */}
               <div className="grid grid-cols-3 gap-3 border-t border-stone-200 pt-6 text-center text-stone-600 text-[11px]">
-                <div className="space-y-1">
-                  <Truck size={17} className="mx-auto text-stone-700" />
+                <button
+                  type="button"
+                  onClick={() => setTrustModal({
+                    title: 'Express Worldwide Courier',
+                    tag: 'Complimentary Over $300',
+                    desc: 'Orders are hand-inspected, pressed, and dispatched in bespoke archival boxes within 24 hours. Enjoy tracked door-to-door express delivery with DHL Express.'
+                  })}
+                  className="space-y-1 p-2 hover:bg-stone-100/70 transition-colors text-center group cursor-pointer"
+                >
+                  <Truck size={17} className="mx-auto text-stone-700 group-hover:text-stone-900 transition-colors" />
                   <p className="font-medium text-stone-900">Express Delivery</p>
                   <p className="text-[10px] text-stone-500 font-light">Dispatches in 24h</p>
-                </div>
-                <div className="space-y-1">
-                  <ShieldCheck size={17} className="mx-auto text-stone-700" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTrustModal({
+                    title: '30-Day Bespoke Returns & Exchanges',
+                    tag: 'Complimentary Worldwide',
+                    desc: 'Try garments on in the comfort of your home. If a different size or silhouette is needed, initiate a complimentary size exchange or full refund within 30 days.'
+                  })}
+                  className="space-y-1 p-2 hover:bg-stone-100/70 transition-colors text-center group cursor-pointer"
+                >
+                  <ShieldCheck size={17} className="mx-auto text-stone-700 group-hover:text-stone-900 transition-colors" />
                   <p className="font-medium text-stone-900">30-Day Returns</p>
                   <p className="text-[10px] text-stone-500 font-light">Complimentary return</p>
-                </div>
-                <div className="space-y-1">
-                  <Sparkles size={17} className="mx-auto text-stone-700" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTrustModal({
+                    title: 'Heritage Mill Certification',
+                    tag: 'Natural Fibers Only',
+                    desc: 'Every fiber is sourced from certified heritage European and Japanese spinning mills. We enforce rigorous environmental and ethical animal welfare standards.'
+                  })}
+                  className="space-y-1 p-2 hover:bg-stone-100/70 transition-colors text-center group cursor-pointer"
+                >
+                  <Sparkles size={17} className="mx-auto text-stone-700 group-hover:text-stone-900 transition-colors" />
                   <p className="font-medium text-stone-900">Pure Fibers</p>
                   <p className="text-[10px] text-stone-500 font-light">Mill certified</p>
-                </div>
+                </button>
               </div>
 
               {/* Accordion Specification Tabs */}
@@ -361,6 +407,216 @@ export default function ProductDetailsPage() {
         )}
 
       </div>
+
+      {/* SIZE GUIDE MODAL */}
+      {sizeGuideOpen && (
+        <div
+          onClick={() => setSizeGuideOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fadeIn cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white border border-stone-200 max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl relative cursor-default"
+          >
+            <div className="flex items-start justify-between border-b border-stone-200 pb-4 mb-6">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.25em] text-[#8C7355] font-semibold block mb-1">
+                  Atelier Atelier Tailoring Reference
+                </span>
+                <h3 className="font-serif text-2xl text-stone-900 font-normal">
+                  {product.category} Sizing Guide
+                </h3>
+              </div>
+              <button
+                onClick={() => setSizeGuideOpen(false)}
+                className="p-1.5 text-stone-400 hover:text-stone-900 transition-colors"
+                aria-label="Close size guide"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Units Toggle */}
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs text-stone-500">
+                Garment measurements taken flat across seams.
+              </span>
+              <div className="inline-flex border border-stone-300 p-0.5 bg-stone-100">
+                <button
+                  id="unit-inches-btn"
+                  onClick={() => setSizeUnit('inches')}
+                  className={`px-3 py-1 text-[11px] font-semibold uppercase tracking-wider transition-colors ${
+                    sizeUnit === 'inches' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-800'
+                  }`}
+                >
+                  Inches
+                </button>
+                <button
+                  id="unit-cm-btn"
+                  onClick={() => setSizeUnit('cm')}
+                  className={`px-3 py-1 text-[11px] font-semibold uppercase tracking-wider transition-colors ${
+                    sizeUnit === 'cm' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-800'
+                  }`}
+                >
+                  CM
+                </button>
+              </div>
+            </div>
+
+            {/* Sizing Table */}
+            <div className="overflow-x-auto border border-stone-200 mb-6">
+              {product.category === 'Pants' ? (
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-[#FAF8F5] border-b border-stone-200 text-stone-700 uppercase tracking-wider text-[10px]">
+                    <tr>
+                      <th className="py-2.5 px-3 font-semibold">Size</th>
+                      <th className="py-2.5 px-3 font-semibold">Waist</th>
+                      <th className="py-2.5 px-3 font-semibold">Hip</th>
+                      <th className="py-2.5 px-3 font-semibold">Inseam</th>
+                      <th className="py-2.5 px-3 font-semibold">Leg Opening</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100 text-stone-800">
+                    <tr>
+                      <td className="py-2.5 px-3 font-semibold">S (30)</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '30.5"' : '77.5 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '40.0"' : '101.6 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '31.5"' : '80.0 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '8.5"' : '21.5 cm'}</td>
+                    </tr>
+                    <tr className="bg-stone-50/50">
+                      <td className="py-2.5 px-3 font-semibold">M (32)</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '32.5"' : '82.5 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '42.0"' : '106.6 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '32.0"' : '81.2 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '8.8"' : '22.3 cm'}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-3 font-semibold">L (34)</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '34.5"' : '87.6 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '44.0"' : '111.7 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '32.5"' : '82.5 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '9.0"' : '22.8 cm'}</td>
+                    </tr>
+                    <tr className="bg-stone-50/50">
+                      <td className="py-2.5 px-3 font-semibold">XL (36)</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '36.5"' : '92.7 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '46.0"' : '116.8 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '33.0"' : '83.8 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '9.3"' : '23.6 cm'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              ) : (
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-[#FAF8F5] border-b border-stone-200 text-stone-700 uppercase tracking-wider text-[10px]">
+                    <tr>
+                      <th className="py-2.5 px-3 font-semibold">Size</th>
+                      <th className="py-2.5 px-3 font-semibold">Chest Circumference</th>
+                      <th className="py-2.5 px-3 font-semibold">Shoulder Width</th>
+                      <th className="py-2.5 px-3 font-semibold">Back Length</th>
+                      <th className="py-2.5 px-3 font-semibold">Sleeve Length</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-100 text-stone-800">
+                    <tr>
+                      <td className="py-2.5 px-3 font-semibold">S (36-38)</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '41.5"' : '105.4 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '18.2"' : '46.2 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '29.0"' : '73.6 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '25.0"' : '63.5 cm'}</td>
+                    </tr>
+                    <tr className="bg-stone-50/50">
+                      <td className="py-2.5 px-3 font-semibold">M (38-40)</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '44.0"' : '111.8 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '19.0"' : '48.2 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '29.7"' : '75.4 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '25.5"' : '64.8 cm'}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-3 font-semibold">L (42-44)</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '46.5"' : '118.1 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '19.8"' : '50.3 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '30.5"' : '77.5 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '26.0"' : '66.0 cm'}</td>
+                    </tr>
+                    <tr className="bg-stone-50/50">
+                      <td className="py-2.5 px-3 font-semibold">XL (46)</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '49.0"' : '124.5 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '20.6"' : '52.3 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '31.2"' : '79.2 cm'}</td>
+                      <td className="py-2.5 px-3">{sizeUnit === 'inches' ? '26.5"' : '67.3 cm'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* Measuring Guidance */}
+            <div className="bg-[#FAF8F5] p-4 border border-stone-200 text-xs text-stone-600 space-y-1.5 mb-6">
+              <p className="font-semibold text-stone-900 uppercase tracking-wider text-[10px]">
+                Tailor's Recommendation
+              </p>
+              <p>
+                Our silhouettes are cut with architectural drape and ease. If you prefer a trimmer silhouette, choose one size down. All trousers feature a 2-inch blind hem allowance for custom cuff alterations.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                id="close-size-guide-btn"
+                onClick={() => setSizeGuideOpen(false)}
+                className="bg-stone-900 text-white px-6 py-2.5 text-xs uppercase tracking-widest font-medium hover:bg-stone-800 transition-colors cursor-pointer"
+              >
+                Close Guide
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TRUST BADGE MODAL */}
+      {trustModal && (
+        <div
+          onClick={() => setTrustModal(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fadeIn cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white border border-stone-200 max-w-md w-full p-6 sm:p-8 shadow-2xl relative text-left cursor-default"
+          >
+            <div className="flex items-start justify-between border-b border-stone-200 pb-3 mb-4">
+              <div>
+                <span className="text-[10px] uppercase tracking-widest text-[#8C7355] font-semibold block">
+                  {trustModal.tag}
+                </span>
+                <h3 className="font-serif text-xl text-stone-900 font-normal mt-0.5">
+                  {trustModal.title}
+                </h3>
+              </div>
+              <button
+                onClick={() => setTrustModal(null)}
+                className="p-1 text-stone-400 hover:text-stone-900 transition-colors"
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <p className="text-xs text-stone-600 leading-relaxed font-light mb-6">
+              {trustModal.desc}
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setTrustModal(null)}
+                className="bg-stone-900 text-white px-5 py-2 text-xs uppercase tracking-wider font-medium hover:bg-stone-800 transition-colors"
+              >
+                Understood
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -12,6 +12,7 @@ export default function CartDrawer() {
     removeFromCart,
     subtotalPrice,
     shippingPrice,
+    taxPrice,
     totalPrice,
   } = useCart();
 
@@ -107,19 +108,33 @@ export default function CartDrawer() {
                   className="flex gap-4 pb-6 border-b border-stone-200 last:border-b-0"
                 >
                   {/* Thumbnail */}
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-20 h-24 object-cover object-top rounded-none bg-stone-100 flex-shrink-0"
-                  />
+                  <Link
+                    to={item.product ? `/product/${item.product}` : '/shop'}
+                    onClick={closeCart}
+                    className="flex-shrink-0 group"
+                    title={`View ${item.name}`}
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-20 h-24 object-cover object-top rounded-none bg-stone-100 group-hover:opacity-85 transition-opacity"
+                    />
+                  </Link>
 
                   {/* Details */}
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-start">
-                        <h3 className="font-serif text-sm font-medium text-stone-900 leading-snug">
-                          {item.name}
-                        </h3>
+                        <Link
+                          to={item.product ? `/product/${item.product}` : '/shop'}
+                          onClick={closeCart}
+                          className="group"
+                          title={`View ${item.name}`}
+                        >
+                          <h3 className="font-serif text-sm font-medium text-stone-900 leading-snug group-hover:text-stone-600 transition-colors">
+                            {item.name}
+                          </h3>
+                        </Link>
                         <button
                           onClick={() => removeFromCart(item.cartKey)}
                           className="text-stone-400 hover:text-red-700 transition-colors p-0.5 ml-2"
@@ -178,6 +193,10 @@ export default function CartDrawer() {
                   <span className="font-medium text-stone-900">
                     {shippingPrice === 0 ? 'Complimentary' : `$${shippingPrice.toLocaleString()}`}
                   </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Estimated Tax (8%)</span>
+                  <span className="font-medium text-stone-900">${taxPrice.toLocaleString()} USD</span>
                 </div>
                 <div className="flex justify-between border-t border-stone-100 pt-2 text-sm font-semibold text-stone-900">
                   <span>Estimated Total</span>

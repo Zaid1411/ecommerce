@@ -26,6 +26,7 @@ export default function AdminPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState('');
+  const [editingProduct, setEditingProduct] = useState(null);
 
   // New garment form state
   const [newProduct, setNewProduct] = useState({
@@ -107,6 +108,41 @@ export default function AdminPage() {
       prev.map((p) => ((p.id || p._id) === id ? { ...p, countInStock: Math.max(0, newStock) } : p))
     );
     triggerNotification('Warehouse stock updated.');
+  };
+
+  // Start editing a product
+  const handleStartEdit = (p) => {
+    setEditingProduct({
+      ...p,
+      id: p.id || p._id,
+      _id: p._id || p.id,
+      name: p.name || '',
+      price: p.price || 0,
+      category: p.category || 'Shirts',
+      countInStock: p.countInStock || 0,
+      leadTime: p.leadTime || 'In Stock - Dispatches in 24h',
+      color: p.color || 'Standard',
+      fabric: p.fabric || 'Natural Cotton',
+      image: p.image || '',
+      description: p.description || '',
+    });
+  };
+
+  // Submit product edit
+  const handleUpdateProductSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    const pId = editingProduct.id || editingProduct._id;
+    try {
+      await productService.update(pId, editingProduct);
+    } catch (err) {
+      console.warn('Backend update unavailable, updating local state', err.message);
+    }
+    setProducts((prev) =>
+      prev.map((p) => ((p.id || p._id) === pId ? { ...p, ...editingProduct } : p))
+    );
+    triggerNotification(`Garment "${editingProduct.name}" updated successfully.`);
+    setEditingProduct(null);
   };
 
   // Order status update
@@ -252,10 +288,10 @@ export default function AdminPage() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="border-b border-stone-200 flex gap-6 text-xs uppercase tracking-wider font-medium">
+        <div className="border-b border-stone-200 flex gap-4 sm:gap-6 text-xs uppercase tracking-wider font-medium overflow-x-auto whitespace-nowrap scrollbar-none pb-1">
           <button
             onClick={() => setActiveTab('products')}
-            className={`pb-3 border-b-2 transition-colors ${
+            className={`pb-3 border-b-2 transition-colors flex-shrink-0 ${
               activeTab === 'products' ? 'border-stone-900 text-stone-900' : 'border-transparent text-stone-400 hover:text-stone-700'
             }`}
           >
@@ -263,7 +299,7 @@ export default function AdminPage() {
           </button>
           <button
             onClick={() => setActiveTab('orders')}
-            className={`pb-3 border-b-2 transition-colors ${
+            className={`pb-3 border-b-2 transition-colors flex-shrink-0 ${
               activeTab === 'orders' ? 'border-stone-900 text-stone-900' : 'border-transparent text-stone-400 hover:text-stone-700'
             }`}
           >
@@ -271,7 +307,7 @@ export default function AdminPage() {
           </button>
           <button
             onClick={() => setActiveTab('new-product')}
-            className={`pb-3 border-b-2 transition-colors ${
+            className={`pb-3 border-b-2 transition-colors flex-shrink-0 ${
               activeTab === 'new-product' ? 'border-stone-900 text-stone-900' : 'border-transparent text-stone-400 hover:text-stone-700'
             }`}
           >
@@ -334,6 +370,13 @@ export default function AdminPage() {
                         >
                           <ArrowUpRight size={16} />
                         </Link>
+                        <button
+                          onClick={() => handleStartEdit(p)}
+                          className="inline-block p-1 text-stone-500 hover:text-stone-900 transition-colors"
+                          title="Edit Garment"
+                        >
+                          <Edit2 size={16} />
+                        </button>
                         <button
                           onClick={() => handleDeleteProduct(pId)}
                           className="p-1 text-stone-400 hover:text-red-700 transition-colors"
@@ -555,6 +598,153 @@ export default function AdminPage() {
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {/* EDIT PRODUCT MODAL */}
+        {editingProduct && (
+          <div
+            onClick={() => setEditingProduct(null)}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn cursor-pointer"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white border border-stone-200 p-6 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl cursor-default"
+            >
+              <div className="flex justify-between items-center border-b border-stone-200 pb-3 mb-5">
+                <h3 className="font-serif text-xl text-stone-900 font-normal">Edit Garment Details</h3>
+                <button
+                  onClick={() => setEditingProduct(null)}
+                  className="text-stone-400 hover:text-stone-800 text-sm font-semibold p-1"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateProductSubmit} className="space-y-4 text-xs">
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
+                    Garment Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editingProduct.name}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                    className="w-full border border-stone-300 p-2 text-xs focus:outline-none focus:border-stone-900"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
+                      Category
+                    </label>
+                    <select
+                      value={editingProduct.category}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+                      className="w-full border border-stone-300 p-2 text-xs focus:outline-none focus:border-stone-900 bg-white"
+                    >
+                      <option value="Shirts">Shirts</option>
+                      <option value="Pants">Pants</option>
+                      <option value="Outerwear">Outerwear</option>
+                      <option value="Knitwear">Knitwear</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
+                      Price ($ USD) *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={editingProduct.price}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, price: Number(e.target.value) })}
+                      className="w-full border border-stone-300 p-2 text-xs focus:outline-none focus:border-stone-900"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
+                      Colorway
+                    </label>
+                    <input
+                      type="text"
+                      value={editingProduct.color}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, color: e.target.value })}
+                      className="w-full border border-stone-300 p-2 text-xs focus:outline-none focus:border-stone-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
+                      Warehouse Stock
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editingProduct.countInStock}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, countInStock: Number(e.target.value) })}
+                      className="w-full border border-stone-300 p-2 text-xs focus:outline-none focus:border-stone-900"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
+                    Fabric Composition
+                  </label>
+                  <input
+                    type="text"
+                    value={editingProduct.fabric}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, fabric: e.target.value })}
+                    className="w-full border border-stone-300 p-2 text-xs focus:outline-none focus:border-stone-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
+                    Image URL
+                  </label>
+                  <input
+                    type="text"
+                    value={editingProduct.image}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, image: e.target.value })}
+                    className="w-full border border-stone-300 p-2 text-xs focus:outline-none focus:border-stone-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-stone-700 font-semibold block mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    rows="3"
+                    value={editingProduct.description}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                    className="w-full border border-stone-300 p-2 text-xs focus:outline-none focus:border-stone-900"
+                  />
+                </div>
+
+                <div className="pt-3 flex justify-end gap-3 border-t border-stone-200">
+                  <button
+                    type="button"
+                    onClick={() => setEditingProduct(null)}
+                    className="px-5 py-2 border border-stone-300 text-stone-700 uppercase tracking-wider text-[11px] hover:bg-stone-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-stone-900 text-white uppercase tracking-wider text-[11px] font-semibold hover:bg-stone-800 transition-colors"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
 

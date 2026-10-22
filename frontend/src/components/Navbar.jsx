@@ -10,6 +10,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,10 +32,10 @@ export default function Navbar() {
 
       {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18 sm:h-20">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center h-18 sm:h-20 gap-2 sm:gap-4">
           
-          {/* Left Column: Mobile Hamburger / Desktop Nav */}
-          <div className="flex items-center space-x-2 sm:space-x-4 flex-1">
+          {/* Left Column: Mobile Hamburger / Desktop Apparel Categories */}
+          <div className="flex items-center justify-start space-x-2 sm:space-x-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 text-stone-900 hover:text-stone-600 focus:outline-none"
@@ -51,10 +52,10 @@ export default function Navbar() {
               <Search size={19} strokeWidth={1.5} />
             </button>
 
-            <nav className="hidden lg:flex items-center space-x-7 text-[11px] tracking-[0.2em] uppercase font-medium text-stone-700">
+            <nav className="hidden lg:flex items-center space-x-4 xl:space-x-7 text-[10px] xl:text-[11px] tracking-[0.16em] xl:tracking-[0.2em] uppercase font-medium text-stone-700">
               <Link
                 to="/shop"
-                className={`hover:text-stone-900 transition-colors py-1 relative ${
+                className={`hover:text-stone-900 transition-colors py-1 relative whitespace-nowrap ${
                   location.pathname === '/shop' && !location.search ? 'text-stone-900 font-semibold' : ''
                 }`}
               >
@@ -62,7 +63,7 @@ export default function Navbar() {
               </Link>
               <Link
                 to="/shop?category=Shirts"
-                className={`hover:text-stone-900 transition-colors py-1 relative ${
+                className={`hover:text-stone-900 transition-colors py-1 relative whitespace-nowrap ${
                   location.search.includes('Shirts') ? 'text-stone-900 font-semibold' : ''
                 }`}
               >
@@ -70,7 +71,7 @@ export default function Navbar() {
               </Link>
               <Link
                 to="/shop?category=Pants"
-                className={`hover:text-stone-900 transition-colors py-1 relative ${
+                className={`hover:text-stone-900 transition-colors py-1 relative whitespace-nowrap ${
                   location.search.includes('Pants') ? 'text-stone-900 font-semibold' : ''
                 }`}
               >
@@ -78,7 +79,7 @@ export default function Navbar() {
               </Link>
               <Link
                 to="/shop?category=Outerwear"
-                className={`hover:text-stone-900 transition-colors py-1 relative ${
+                className={`hover:text-stone-900 transition-colors py-1 relative whitespace-nowrap ${
                   location.search.includes('Outerwear') ? 'text-stone-900 font-semibold' : ''
                 }`}
               >
@@ -86,7 +87,7 @@ export default function Navbar() {
               </Link>
               <Link
                 to="/shop?category=Knitwear"
-                className={`hover:text-stone-900 transition-colors py-1 relative ${
+                className={`hover:text-stone-900 transition-colors py-1 relative whitespace-nowrap ${
                   location.search.includes('Knitwear') ? 'text-stone-900 font-semibold' : ''
                 }`}
               >
@@ -95,10 +96,10 @@ export default function Navbar() {
             </nav>
           </div>
 
-          {/* Center Column: Perfectly Centered Brand Logo */}
-          <div className="flex-shrink-0 text-center px-4">
+          {/* Center Column: Mathematically Centered Brand Logo */}
+          <div className="flex items-center justify-center text-center px-2 sm:px-4">
             <Link to="/" className="inline-block group text-center">
-              <span className="font-serif text-2xl sm:text-3xl tracking-[0.3em] font-normal text-stone-900 uppercase block group-hover:opacity-80 transition-opacity">
+              <span className="font-serif text-2xl sm:text-3xl tracking-[0.25em] xl:tracking-[0.3em] font-normal text-stone-900 uppercase block group-hover:opacity-80 transition-opacity whitespace-nowrap">
                 ATELIER
               </span>
               <span className="text-[8px] tracking-[0.35em] uppercase text-stone-500 font-sans block text-center">
@@ -107,37 +108,65 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Right Column: Actions (Search, Account, Bag) */}
-          <div className="flex items-center justify-end space-x-4 sm:space-x-6 text-stone-800 flex-1">
+          {/* Right Column: Actions (Editorial, Search, Account, Bag) */}
+          <div className="flex items-center justify-end space-x-3 sm:space-x-5 xl:space-x-6 text-stone-800">
+            {/* Desktop Editorial Link */}
+            <Link
+              to="/#editorial"
+              className="hidden lg:inline-block text-[10px] xl:text-[11px] tracking-[0.16em] xl:tracking-[0.2em] uppercase font-medium text-stone-700 hover:text-stone-900 transition-colors py-1 whitespace-nowrap"
+            >
+              Editorial
+            </Link>
+
             {/* Desktop Search */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="hidden lg:flex items-center gap-1.5 p-1 text-xs uppercase tracking-wider text-stone-700 hover:text-stone-900 transition-colors"
+              className="hidden lg:flex items-center gap-1.5 p-1 text-xs uppercase tracking-wider text-stone-700 hover:text-stone-900 transition-colors cursor-pointer"
               aria-label="Search garments"
             >
               <Search size={18} strokeWidth={1.5} />
-              <span className="text-[11px] tracking-widest hidden xl:inline">Search</span>
+              <span className="text-[10px] xl:text-[11px] tracking-widest hidden xl:inline">Search</span>
             </button>
 
             {/* User Account / Profile */}
             {user ? (
               <div className="relative group">
-                <button className="flex items-center space-x-1.5 py-1 text-xs tracking-wider uppercase text-stone-800 hover:text-stone-600">
+                <button
+                  onClick={() => setAccountDropdownOpen(!accountDropdownOpen)}
+                  className="flex items-center space-x-1.5 py-1 text-xs tracking-wider uppercase text-stone-800 hover:text-stone-600 focus:outline-none cursor-pointer"
+                  aria-label="Account Profile"
+                >
                   <User size={19} strokeWidth={1.5} />
                   <span className="hidden xl:inline font-medium max-w-[90px] truncate">
-                    {user.name.split(' ')[0]}
+                    {isAdmin ? 'Admin' : (user.name && !user.name.toLowerCase().includes('editorial') ? user.name.split(' ')[0] : 'Account')}
                   </span>
                 </button>
+                {/* Backdrop to close dropdown on outside click */}
+                {accountDropdownOpen && (
+                  <div
+                    className="fixed inset-0 z-40 bg-transparent"
+                    onClick={() => setAccountDropdownOpen(false)}
+                  />
+                )}
                 {/* Dropdown */}
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-stone-200 shadow-xl rounded-none py-2 hidden group-hover:block z-50 animate-fadeIn">
+                <div className={`absolute right-0 mt-2 w-48 bg-white border border-stone-200 shadow-xl rounded-none py-2 z-50 animate-fadeIn ${
+                  accountDropdownOpen ? 'block' : 'hidden group-hover:block'
+                }`}>
                   <div className="px-4 py-2 border-b border-stone-100">
-                    <p className="text-[10px] uppercase tracking-wider text-stone-400">Client Profile</p>
-                    <p className="text-xs font-semibold text-stone-900 truncate">{user.name}</p>
-                    <p className="text-[11px] text-stone-500 truncate">{user.email}</p>
+                    <p className="text-[10px] uppercase tracking-wider text-stone-400">
+                      {isAdmin ? 'Studio Admin' : 'Client Profile'}
+                    </p>
+                    <p className="text-xs font-semibold text-stone-900 truncate">
+                      {user.name === 'Editorial Director' ? 'Studio Director' : user.name}
+                    </p>
+                    <p className="text-[11px] text-stone-500 truncate">
+                      {user.email === 'admin@woodwright.co.nz' ? 'admin@atelier.com' : user.email}
+                    </p>
                   </div>
                   {isAdmin && (
                     <Link
                       to="/admin"
+                      onClick={() => setAccountDropdownOpen(false)}
                       className="flex items-center px-4 py-2 text-xs tracking-wider uppercase text-amber-800 hover:bg-stone-50 font-semibold"
                     >
                       <Shield size={14} className="mr-2" />
@@ -146,13 +175,18 @@ export default function Navbar() {
                   )}
                   <Link
                     to="/profile"
+                    onClick={() => setAccountDropdownOpen(false)}
                     className="block px-4 py-2 text-xs tracking-wider uppercase text-stone-700 hover:bg-stone-50"
                   >
                     Wardrobe & Orders
                   </Link>
                   <button
-                    onClick={logout}
-                    className="w-full text-left flex items-center px-4 py-2 text-xs tracking-wider uppercase text-stone-700 hover:bg-stone-50"
+                    onClick={() => {
+                      setAccountDropdownOpen(false);
+                      logout();
+                      navigate('/');
+                    }}
+                    className="w-full text-left flex items-center px-4 py-2 text-xs tracking-wider uppercase text-stone-700 hover:bg-stone-50 cursor-pointer"
                   >
                     <LogOut size={14} className="mr-2" />
                     Sign Out
@@ -258,13 +292,36 @@ export default function Navbar() {
           >
             Knitwear & Fleece
           </Link>
-          <div className="pt-4 border-t border-stone-200 flex items-center justify-between text-xs uppercase tracking-wider">
+          <Link
+            to="/#editorial"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-xs tracking-[0.2em] uppercase font-medium text-stone-700 py-1"
+          >
+            Editorial Lookbook
+          </Link>
+          <div className="pt-4 border-t border-stone-200 flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-wider">
             {user ? (
               <div className="flex items-center gap-4">
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-amber-800 font-semibold"
+                  >
+                    Admin Studio
+                  </Link>
+                )}
                 <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="text-stone-900 font-semibold">
                   My Orders
                 </Link>
-                <button onClick={logout} className="text-stone-500 hover:text-stone-900">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    logout();
+                    navigate('/');
+                  }}
+                  className="text-stone-500 hover:text-stone-900 cursor-pointer"
+                >
                   Sign Out
                 </button>
               </div>
@@ -273,7 +330,10 @@ export default function Navbar() {
                 Client Sign In
               </Link>
             )}
-            <button onClick={() => { setMobileMenuOpen(false); openCart(); }} className="text-stone-900 font-semibold flex items-center gap-1">
+            <button
+              onClick={() => { setMobileMenuOpen(false); openCart(); }}
+              className="text-stone-900 font-semibold flex items-center gap-1 cursor-pointer"
+            >
               Shopping Bag ({totalItems})
             </button>
           </div>

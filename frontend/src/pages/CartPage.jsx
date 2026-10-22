@@ -11,6 +11,7 @@ export default function CartPage() {
     clearCart,
     subtotalPrice,
     shippingPrice,
+    taxPrice,
     totalPrice,
   } = useCart();
 
@@ -56,20 +57,28 @@ export default function CartPage() {
           {/* Cart Items Table */}
           <div className="lg:col-span-8 space-y-6">
             <div className="bg-white border border-stone-200 divide-y divide-stone-200">
-              {cartItems.map((item) => (
-                <div key={item.cartKey} className="p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-24 h-28 object-cover object-top bg-stone-100 flex-shrink-0"
-                  />
-                  <div className="flex-1 space-y-1">
-                    <h3 className="font-serif text-lg text-stone-900 font-normal">{item.name}</h3>
-                    <p className="text-xs text-stone-700 font-medium">
-                      Size: <span className="font-bold text-stone-900">{item.selectedSize}</span> · Color: {item.selectedColor}
-                    </p>
-                    <p className="text-xs text-stone-400">Unit Price: ${item.price.toLocaleString()} USD</p>
-                  </div>
+              {cartItems.map((item) => {
+                const itemLink = item.product ? `/product/${item.product}` : '/shop';
+                return (
+                  <div key={item.cartKey} className="p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+                    <Link to={itemLink} className="flex-shrink-0 group" title={`View ${item.name}`}>
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-24 h-28 object-cover object-top bg-stone-100 group-hover:opacity-85 transition-opacity"
+                      />
+                    </Link>
+                    <div className="flex-1 space-y-1">
+                      <Link to={itemLink} className="block group" title={`View ${item.name}`}>
+                        <h3 className="font-serif text-lg text-stone-900 font-normal group-hover:text-stone-600 transition-colors">
+                          {item.name}
+                        </h3>
+                      </Link>
+                      <p className="text-xs text-stone-700 font-medium">
+                        Size: <span className="font-bold text-stone-900">{item.selectedSize}</span> · Color: {item.selectedColor}
+                      </p>
+                      <p className="text-xs text-stone-400">Unit Price: ${item.price.toLocaleString()} USD</p>
+                    </div>
 
                   {/* Quantity */}
                   <div className="flex items-center border border-stone-300">
@@ -102,7 +111,8 @@ export default function CartPage() {
                     </button>
                   </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
 
             <div className="bg-[#F4EFEA] p-4 border border-stone-200 flex items-center gap-3 text-xs text-stone-700">
@@ -130,6 +140,10 @@ export default function CartPage() {
                   <span className="font-semibold text-stone-900">
                     {shippingPrice === 0 ? 'Complimentary' : `$${shippingPrice.toLocaleString()} USD`}
                   </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Estimated Sales Tax (8%)</span>
+                  <span className="font-semibold text-stone-900">${taxPrice.toLocaleString()} USD</span>
                 </div>
                 <div className="flex justify-between border-t border-stone-200 pt-3 text-sm font-semibold text-stone-900">
                   <span>Total Amount</span>

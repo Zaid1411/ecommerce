@@ -170,7 +170,7 @@ export default function HomePage() {
       </section>
 
       {/* 4. THE FABRIC MANIFESTO (H&M Premium Selection Style) */}
-      <section className="bg-white border-y border-stone-200/80 py-16 sm:py-24">
+      <section id="editorial" className="bg-white border-y border-stone-200/80 py-16 sm:py-24 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
@@ -184,7 +184,7 @@ export default function HomePage() {
 
             <div className="lg:col-span-6 space-y-6">
               <span className="text-[10px] uppercase tracking-[0.25em] text-stone-500 font-semibold block">
-                The Atelier Standard
+                Editorial • The Atelier Standard
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl font-normal text-stone-900 leading-tight">
                 Quiet luxury crafted with heritage European natural fibers.

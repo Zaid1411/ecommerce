@@ -19,6 +19,8 @@ export default function ShopPage() {
   const [maxPrice, setMaxPrice] = useState(1000);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
 
   // Sync state with URL params
   useEffect(() => {
@@ -27,6 +29,11 @@ export default function ShopPage() {
     setSelectedCategory(cat);
     setSearchQuery(q);
   }, [searchParams]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery, maxPrice, inStockOnly, sortBy]);
 
   // Fetch products
   useEffect(() => {
@@ -70,6 +77,12 @@ export default function ShopPage() {
 
     return result;
   }, [products, maxPrice, inStockOnly, sortBy]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
 
   const handleCategoryChange = (cat) => {
     setSelectedCategory(cat);
@@ -224,10 +237,58 @@ export default function ShopPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-10 sm:gap-y-12">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id || product._id} product={product} />
-            ))}
+          <div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-10 sm:gap-y-12">
+              {paginatedProducts.map((product) => (
+                <ProductCard key={product.id || product._id} product={product} />
+              ))}
+            </div>
+
+            {/* Pagination Bar */}
+            {totalPages > 1 && (
+              <div className="mt-14 pt-8 border-t border-stone-200 flex items-center justify-between">
+                <button
+                  onClick={() => {
+                    setCurrentPage((p) => Math.max(1, p - 1));
+                    window.scrollTo({ top: 180, behavior: 'smooth' });
+                  }}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 text-xs uppercase tracking-wider font-medium text-stone-700 border border-stone-300 disabled:opacity-30 disabled:cursor-not-allowed hover:border-stone-900 transition-colors"
+                >
+                  Previous
+                </button>
+
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => {
+                        setCurrentPage(pageNum);
+                        window.scrollTo({ top: 180, behavior: 'smooth' });
+                      }}
+                      className={`w-8 h-8 text-xs font-medium transition-colors ${
+                        currentPage === pageNum
+                          ? 'bg-stone-900 text-white shadow-sm'
+                          : 'border border-stone-200 text-stone-700 hover:border-stone-400 bg-white'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setCurrentPage((p) => Math.min(totalPages, p + 1));
+                    window.scrollTo({ top: 180, behavior: 'smooth' });
+                  }}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 text-xs uppercase tracking-wider font-medium text-stone-700 border border-stone-300 disabled:opacity-30 disabled:cursor-not-allowed hover:border-stone-900 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         )}
 

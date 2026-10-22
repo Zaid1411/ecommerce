@@ -43,7 +43,7 @@ export default function RegisterPage() {
           </span>
           <h1 className="font-serif text-3xl font-normal text-stone-900">Create an Account</h1>
           <p className="text-xs text-stone-500 font-light">
-            Create an account to track your handcrafted furniture commissions and warranties.
+            Create an account to track your orders, private capsule drops, and complimentary returns.
           </p>
         </div>
 
@@ -132,7 +132,7 @@ export default function RegisterPage() {
         </form>
 
         <div className="text-center text-xs text-stone-500 pt-2 border-t border-stone-100">
-          <span>Already registered with Woodwright? </span>
+          <span>Already registered with ATELIER? </span>
           <Link to="/login" className="text-stone-900 font-semibold hover:underline">
             Sign In Here
           </Link>
