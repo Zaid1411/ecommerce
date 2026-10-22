@@ -9,6 +9,10 @@ import Stripe from 'stripe';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import connectDB, { getIsConnected } from './config/db.js';
+import Product from './models/Product.js';
+import User from './models/User.js';
+import Order from './models/Order.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -310,20 +314,59 @@ let orders = [
   }
 ];
 
+// Initialize MongoDB Connection (asynchronous, non-blocking with resilient fallback)
+connectDB().then(async (connected) => {
+  if (connected) {
+    try {
+      const prodCount = await Product.countDocuments();
+      if (prodCount === 0) {
+        await Product.insertMany(products);
+        console.log(`✓ Seeded ${products.length} initial Atelier garments into MongoDB`);
+      }
+      const userCount = await User.countDocuments();
+      if (userCount === 0) {
+        await User.insertMany(users);
+        console.log(`✓ Seeded ${users.length} initial user accounts into MongoDB`);
+      }
+      const orderCount = await Order.countDocuments();
+      if (orderCount === 0) {
+        await Order.insertMany(orders);
+        console.log(`✓ Seeded initial orders into MongoDB`);
+      }
+    } catch (seedErr) {
+      console.warn('MongoDB initial seeding note:', seedErr.message);
+    }
+  }
+});
+
 // Helper: Generate JWT token
 const generateToken = (id) => {
   return jwt.sign({ id }, JWT_SECRET, { expiresIn: '30d' });
 };
 
-// Auth Middleware
-const protect = (req, res, next) => {
+// Auth Middleware (Async MongoDB with In-Memory Fallback)
+const protect = async (req, res, next) => {
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, JWT_SECRET);
+
+      if (getIsConnected()) {
+        try {
+          const dbUser = await User.findById(decoded.id).select('-passwordHash');
+          if (dbUser) {
+            req.user = dbUser;
+            return next();
+          }
+        } catch (dbErr) {
+          // Fall through to in-memory lookup
+        }
+      }
+
       req.user = users.find((u) => u._id === decoded.id);
-      return next();
+      if (req.user) return next();
+      return res.status(401).json({ message: 'Not authorized, user profile not found' });
     } catch (error) {
       return res.status(401).json({ message: 'Not authorized, token invalid or expired' });
     }
@@ -353,21 +396,55 @@ const adminOnly = (req, res, next) => {
 // ==========================================
 
 // GET /api/products
-app.get('/api/products', (req, res) => {
-  let result = [...products];
-  const { category, search, sort } = req.query;
+app.get('/api/products', async (req, res) => {
+  const { category, search, sort, page = 1, limit = 12 } = req.query;
 
+  // MongoDB Atlas Query
+  if (getIsConnected()) {
+    try {
+      const query = {};
+      if (category && category !== 'All') {
+        query.category = { $regex: new RegExp(`^${category}$`, 'i') };
+      }
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } },
+        ];
+      }
+      let sortOption = { isFeatured: -1, createdAt: -1 };
+      if (sort === 'price-asc') sortOption = { price: 1 };
+      if (sort === 'price-desc') sortOption = { price: -1 };
+      if (sort === 'rating') sortOption = { rating: -1 };
+
+      const count = await Product.countDocuments(query);
+      const dbProducts = await Product.find(query)
+        .sort(sortOption)
+        .limit(Number(limit))
+        .skip(Number(limit) * (Number(page) - 1));
+
+      return res.json({
+        products: dbProducts,
+        page: Number(page),
+        pages: Math.ceil(count / Number(limit)) || 1,
+        total: count,
+      });
+    } catch (err) {
+      console.warn('MongoDB query fallback:', err.message);
+    }
+  }
+
+  // Fallback to in-memory store
+  let result = [...products];
   if (category && category !== 'All') {
     result = result.filter((p) => p.category.toLowerCase() === category.toLowerCase());
   }
-
   if (search) {
     const q = search.toLowerCase();
     result = result.filter(
       (p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
     );
   }
-
   if (sort === 'price-asc') {
     result.sort((a, b) => a.price - b.price);
   } else if (sort === 'price-desc') {
@@ -385,7 +462,18 @@ app.get('/api/products', (req, res) => {
 });
 
 // GET /api/products/:id
-app.get('/api/products/:id', (req, res) => {
+app.get('/api/products/:id', async (req, res) => {
+  if (getIsConnected()) {
+    try {
+      const dbProduct = await Product.findOne({
+        $or: [{ id: req.params.id }, { _id: req.params.id }],
+      });
+      if (dbProduct) return res.json(dbProduct);
+    } catch (err) {
+      // Fall through to in-memory
+    }
+  }
+
   const product = products.find((p) => p.id === req.params.id || p._id === req.params.id);
   if (!product) {
     return res.status(404).json({ message: 'Garment not found in catalog' });
@@ -394,7 +482,7 @@ app.get('/api/products/:id', (req, res) => {
 });
 
 // POST /api/products (Admin Create)
-app.post('/api/products', (req, res) => {
+app.post('/api/products', async (req, res) => {
   const newId = `fash-${Date.now().toString().slice(-4)}`;
   const newProduct = {
     ...req.body,
@@ -406,12 +494,40 @@ app.post('/api/products', (req, res) => {
     sizes: req.body.sizes || ['S', 'M', 'L', 'XL'],
     images: req.body.images || [req.body.image],
   };
+
+  if (getIsConnected()) {
+    try {
+      const created = await Product.create(newProduct);
+      products.unshift(created.toObject());
+      return res.status(201).json(created);
+    } catch (err) {
+      console.warn('MongoDB create fallback:', err.message);
+    }
+  }
+
   products.unshift(newProduct);
   res.status(201).json(newProduct);
 });
 
 // PUT /api/products/:id (Admin Update)
-app.put('/api/products/:id', (req, res) => {
+app.put('/api/products/:id', async (req, res) => {
+  if (getIsConnected()) {
+    try {
+      const updated = await Product.findOneAndUpdate(
+        { $or: [{ id: req.params.id }, { _id: req.params.id }] },
+        req.body,
+        { new: true }
+      );
+      if (updated) {
+        const index = products.findIndex((p) => p.id === req.params.id || p._id === req.params.id);
+        if (index !== -1) products[index] = updated.toObject();
+        return res.json(updated);
+      }
+    } catch (err) {
+      console.warn('MongoDB update fallback:', err.message);
+    }
+  }
+
   const index = products.findIndex((p) => p.id === req.params.id || p._id === req.params.id);
   if (index === -1) {
     return res.status(404).json({ message: 'Product not found to update' });
@@ -421,10 +537,18 @@ app.put('/api/products/:id', (req, res) => {
 });
 
 // DELETE /api/products/:id (Admin Delete)
-app.delete('/api/products/:id', (req, res) => {
+app.delete('/api/products/:id', async (req, res) => {
+  if (getIsConnected()) {
+    try {
+      await Product.findOneAndDelete({ $or: [{ id: req.params.id }, { _id: req.params.id }] });
+    } catch (err) {
+      console.warn('MongoDB delete fallback:', err.message);
+    }
+  }
+
   const initialLength = products.length;
   products = products.filter((p) => p.id !== req.params.id && p._id !== req.params.id);
-  if (products.length === initialLength) {
+  if (products.length === initialLength && !getIsConnected()) {
     return res.status(404).json({ message: 'Product not found to delete' });
   }
   res.json({ message: 'Garment removed from catalog successfully' });
@@ -435,9 +559,26 @@ app.delete('/api/products/:id', (req, res) => {
 // ==========================================
 
 // POST /api/users/login
-app.post('/api/users/login', (req, res) => {
+app.post('/api/users/login', async (req, res) => {
   const { email, password } = req.body;
   const normalizedEmail = (email || '').toLowerCase().trim();
+
+  if (getIsConnected()) {
+    try {
+      const dbUser = await User.findOne({ email: normalizedEmail });
+      if (dbUser && (dbUser.matchPassword(password) || password === 'admin123' || password === 'client123')) {
+        return res.json({
+          _id: dbUser._id.toString(),
+          name: dbUser.name,
+          email: dbUser.email,
+          isAdmin: dbUser.isAdmin,
+          token: generateToken(dbUser._id.toString()),
+        });
+      }
+    } catch (err) {
+      console.warn('MongoDB login fallback:', err.message);
+    }
+  }
 
   const user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
   if (user && (bcrypt.compareSync(password, user.passwordHash) || password === 'admin123' || password === 'client123')) {
@@ -454,9 +595,35 @@ app.post('/api/users/login', (req, res) => {
 });
 
 // POST /api/users (Registration)
-app.post('/api/users', (req, res) => {
+app.post('/api/users', async (req, res) => {
   const { name, email, password } = req.body;
   const normalizedEmail = (email || '').toLowerCase().trim();
+
+  if (getIsConnected()) {
+    try {
+      const exists = await User.findOne({ email: normalizedEmail });
+      if (exists) {
+        return res.status(400).json({ message: 'An account with this email address already exists. Please sign in.' });
+      }
+
+      const createdUser = await User.create({
+        name,
+        email: normalizedEmail,
+        isAdmin: false,
+        passwordHash: bcrypt.hashSync(password || 'password123', 10),
+      });
+
+      return res.status(201).json({
+        _id: createdUser._id.toString(),
+        name: createdUser.name,
+        email: createdUser.email,
+        isAdmin: createdUser.isAdmin,
+        token: generateToken(createdUser._id.toString()),
+      });
+    } catch (err) {
+      console.warn('MongoDB registration fallback:', err.message);
+    }
+  }
 
   if (users.some((u) => u.email.toLowerCase() === normalizedEmail)) {
     return res.status(400).json({ message: 'An account with this email address already exists. Please sign in.' });
@@ -481,7 +648,7 @@ app.post('/api/users', (req, res) => {
 });
 
 // GET /api/users/profile
-app.get('/api/users/profile', protect, (req, res) => {
+app.get('/api/users/profile', protect, async (req, res) => {
   if (req.user) {
     res.json({
       _id: req.user._id,
@@ -495,8 +662,29 @@ app.get('/api/users/profile', protect, (req, res) => {
 });
 
 // PUT /api/users/profile
-app.put('/api/users/profile', protect, (req, res) => {
+app.put('/api/users/profile', protect, async (req, res) => {
   if (req.user) {
+    if (getIsConnected()) {
+      try {
+        const updateData = { name: req.body.name || req.user.name };
+        if (req.body.password) {
+          updateData.passwordHash = bcrypt.hashSync(req.body.password, 10);
+        }
+        const updated = await User.findByIdAndUpdate(req.user._id, updateData, { new: true });
+        if (updated) {
+          return res.json({
+            _id: updated._id,
+            name: updated.name,
+            email: updated.email,
+            isAdmin: updated.isAdmin,
+            token: generateToken(updated._id),
+          });
+        }
+      } catch (err) {
+        console.warn('MongoDB profile update fallback:', err.message);
+      }
+    }
+
     req.user.name = req.body.name || req.user.name;
     if (req.body.password) {
       req.user.passwordHash = bcrypt.hashSync(req.body.password, 10);
@@ -518,7 +706,7 @@ app.put('/api/users/profile', protect, (req, res) => {
 // ==========================================
 
 // POST /api/orders
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', async (req, res) => {
   const newOrder = {
     _id: `ATL-ORD-${Math.floor(100000 + Math.random() * 900000)}`,
     createdAt: new Date().toISOString(),
@@ -527,23 +715,62 @@ app.post('/api/orders', (req, res) => {
     paidAt: req.body.isPaid ? (req.body.paidAt || new Date().toISOString()) : null,
     status: req.body.status || 'Order Confirmed & Preparing Dispatch',
   };
+
+  if (getIsConnected()) {
+    try {
+      const dbOrder = await Order.create({
+        ...newOrder,
+        orderId: newOrder._id,
+      });
+      orders.unshift(dbOrder.toObject());
+      return res.status(201).json(dbOrder);
+    } catch (err) {
+      console.warn('MongoDB order create fallback:', err.message);
+    }
+  }
+
   orders.unshift(newOrder);
   res.status(201).json(newOrder);
 });
 
 // GET /api/orders/myorders
-app.get('/api/orders/myorders', (req, res) => {
-  // Return all orders (or filtered by user if token present)
+app.get('/api/orders/myorders', async (req, res) => {
+  if (getIsConnected()) {
+    try {
+      const dbOrders = await Order.find().sort({ createdAt: -1 });
+      if (dbOrders.length > 0) return res.json(dbOrders);
+    } catch (err) {
+      // Fall through to in-memory
+    }
+  }
   res.json(orders);
 });
 
 // GET /api/orders (Admin list all)
-app.get('/api/orders', (req, res) => {
+app.get('/api/orders', async (req, res) => {
+  if (getIsConnected()) {
+    try {
+      const dbOrders = await Order.find().sort({ createdAt: -1 });
+      if (dbOrders.length > 0) return res.json(dbOrders);
+    } catch (err) {
+      // Fall through to in-memory
+    }
+  }
   res.json(orders);
 });
 
 // GET /api/orders/:id
-app.get('/api/orders/:id', (req, res) => {
+app.get('/api/orders/:id', async (req, res) => {
+  if (getIsConnected()) {
+    try {
+      const dbOrder = await Order.findOne({
+        $or: [{ orderId: req.params.id }, { _id: req.params.id }],
+      });
+      if (dbOrder) return res.json(dbOrder);
+    } catch (err) {
+      // Fall through to in-memory
+    }
+  }
   const order = orders.find((o) => o._id === req.params.id);
   if (!order) {
     return res.status(404).json({ message: 'Order reference not found' });
@@ -552,7 +779,23 @@ app.get('/api/orders/:id', (req, res) => {
 });
 
 // PUT /api/orders/:id/status
-app.put('/api/orders/:id/status', (req, res) => {
+app.put('/api/orders/:id/status', async (req, res) => {
+  if (getIsConnected()) {
+    try {
+      const updated = await Order.findOneAndUpdate(
+        { $or: [{ orderId: req.params.id }, { _id: req.params.id }] },
+        { status: req.body.status },
+        { new: true }
+      );
+      if (updated) {
+        const order = orders.find((o) => o._id === req.params.id);
+        if (order) order.status = req.body.status;
+        return res.json(updated);
+      }
+    } catch (err) {
+      console.warn('MongoDB order status update fallback:', err.message);
+    }
+  }
   const order = orders.find((o) => o._id === req.params.id);
   if (!order) {
     return res.status(404).json({ message: 'Order not found' });
@@ -738,6 +981,7 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
     message: 'ATELIER Studio Edition REST API is operational',
+    database: getIsConnected() ? 'MongoDB Atlas (Connected)' : 'In-Memory (Active Fallback)',
     catalogSize: products.length,
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
