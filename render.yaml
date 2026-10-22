@@ -51,4 +51,3 @@ services:
           type: web
           name: atelier-api
           property: host
-          format: https://{host}/api

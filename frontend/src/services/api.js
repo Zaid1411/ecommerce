@@ -2,12 +2,15 @@ import axios from 'axios';
 import { MOCK_PRODUCTS } from '../data/mockProducts';
 
 const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
+  let envUrl = import.meta.env.VITE_API_URL;
   if (!envUrl) {
     if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
       return `${window.location.origin}/api`;
     }
     return 'http://localhost:5001/api';
+  }
+  if (!envUrl.startsWith('http://') && !envUrl.startsWith('https://')) {
+    envUrl = `https://${envUrl}`;
   }
   return envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/+$/, '')}/api`;
 };
