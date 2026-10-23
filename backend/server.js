@@ -707,10 +707,29 @@ app.put('/api/users/profile', protect, async (req, res) => {
 
 // POST /api/orders
 app.post('/api/orders', async (req, res) => {
+  let userId = null;
+  const userEmail = (req.body.shippingAddress?.email || req.body.userEmail || '').toLowerCase().trim();
+
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, JWT_SECRET);
+      userId = decoded.id;
+    } catch (e) {
+      // ignore token parse error
+    }
+  }
+
+  if (!userId && req.body.user) {
+    userId = typeof req.body.user === 'object' ? req.body.user._id : req.body.user;
+  }
+
   const newOrder = {
     _id: `ATL-ORD-${Math.floor(100000 + Math.random() * 900000)}`,
     createdAt: new Date().toISOString(),
     ...req.body,
+    user: userId || req.body.user || null,
+    userEmail: userEmail || undefined,
     isPaid: req.body.isPaid ?? true,
     paidAt: req.body.isPaid ? (req.body.paidAt || new Date().toISOString()) : null,
     status: req.body.status || 'Order Confirmed & Preparing Dispatch',
@@ -718,11 +737,9 @@ app.post('/api/orders', async (req, res) => {
 
   if (getIsConnected()) {
     try {
-      const dbOrder = await Order.create({
-        ...newOrder,
-        orderId: newOrder._id,
-      });
-      orders.unshift(dbOrder.toObject());
+      const orderToSave = { ...newOrder, orderId: newOrder._id };
+      const dbOrder = await Order.create(orderToSave);
+      orders.unshift({ ...dbOrder.toObject(), user: userId || newOrder.user });
       return res.status(201).json(dbOrder);
     } catch (err) {
       console.warn('MongoDB order create fallback:', err.message);
@@ -734,16 +751,45 @@ app.post('/api/orders', async (req, res) => {
 });
 
 // GET /api/orders/myorders
-app.get('/api/orders/myorders', async (req, res) => {
+app.get('/api/orders/myorders', protect, async (req, res) => {
+  const currentUserId = req.user?._id ? req.user._id.toString() : (req.user?.id ? req.user.id.toString() : null);
+  const currentUserEmail = (req.user?.email || '').toLowerCase().trim();
+
   if (getIsConnected()) {
     try {
-      const dbOrders = await Order.find().sort({ createdAt: -1 });
-      if (dbOrders.length > 0) return res.json(dbOrders);
+      const orConditions = [];
+      if (currentUserId && mongoose.Types.ObjectId.isValid(currentUserId)) {
+        orConditions.push({ user: currentUserId });
+      }
+      if (currentUserEmail) {
+        orConditions.push({
+          'shippingAddress.email': { $regex: new RegExp(`^${currentUserEmail}$`, 'i') },
+        });
+        orConditions.push({
+          userEmail: { $regex: new RegExp(`^${currentUserEmail}$`, 'i') },
+        });
+      }
+
+      if (orConditions.length > 0) {
+        const dbOrders = await Order.find({ $or: orConditions }).sort({ createdAt: -1 });
+        return res.json(dbOrders);
+      }
+      return res.json([]);
     } catch (err) {
-      // Fall through to in-memory
+      console.warn('MongoDB myorders query fallback:', err.message);
     }
   }
-  res.json(orders);
+
+  // In-memory filter strictly for the current user's ID or email
+  const userOrders = orders.filter((o) => {
+    const oUserId = o.user && typeof o.user === 'object' ? (o.user._id || o.user.id) : o.user;
+    const matchesId = currentUserId && oUserId && oUserId.toString() === currentUserId;
+    const oEmail = (o.shippingAddress?.email || o.userEmail || (o.user && typeof o.user === 'object' ? o.user.email : '') || '').toLowerCase().trim();
+    const matchesEmail = Boolean(currentUserEmail && oEmail && oEmail === currentUserEmail);
+    return matchesId || matchesEmail;
+  });
+
+  res.json(userOrders);
 });
 
 // GET /api/orders (Admin list all)

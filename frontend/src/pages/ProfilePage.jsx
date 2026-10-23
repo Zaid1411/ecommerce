@@ -23,17 +23,20 @@ export default function ProfilePage() {
     async function loadOrders() {
       try {
         const data = await orderService.getMyOrders();
-        setOrders(data);
+        setOrders(Array.isArray(data) ? data : []);
       } catch (err) {
-        // Fallback demo orders combined with any newly placed simulated orders
+        console.warn('Could not fetch orders from API:', err.message);
+        // Fallback to local storage scoped strictly to this user's email
         let savedOrders = [];
+        const userEmailKey = (user?.email || '').toLowerCase().trim();
         try {
-          savedOrders = JSON.parse(localStorage.getItem('atelier_orders') || '[]');
+          savedOrders = JSON.parse(localStorage.getItem(`atelier_orders_${userEmailKey}`) || '[]');
         } catch (e) {
-          console.error('Failed to parse atelier_orders', e);
+          console.error('Failed to parse local user orders', e);
         }
 
-        const defaultOrders = [
+        // Only show sample demo order if explicitly logged into the demo client account
+        const defaultOrders = (userEmailKey === 'client@example.com') ? [
           {
             _id: 'ATL-ORD-892104',
             createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
@@ -60,13 +63,13 @@ export default function ProfilePage() {
               }
             ],
             shippingAddress: {
-              fullName: user.name || 'Client',
+              fullName: user.name || 'Sophie Montgomery',
               address: '742 Evergreen Terrace',
               city: 'New York',
               country: 'United States'
             }
           }
-        ];
+        ] : [];
 
         setOrders([...savedOrders, ...defaultOrders]);
       } finally {

@@ -189,6 +189,8 @@ export default function CheckoutPage() {
       // 4. Create Order Record
       setPaymentStepText('Recording Atelier Bespoke Order...');
       const orderPayload = {
+        user: user?._id || user?.id || null,
+        userEmail: (user?.email || formData.email || '').toLowerCase().trim(),
         orderItems: cartItems.map((item) => ({
           name: item.name,
           qty: item.quantity,
@@ -238,10 +240,14 @@ export default function CheckoutPage() {
         };
       }
 
-      // Persist order to localStorage
+      // Persist order to localStorage keyed strictly by user email to avoid cross-account bleeding
       try {
-        const existing = JSON.parse(localStorage.getItem('atelier_orders') || '[]');
-        localStorage.setItem('atelier_orders', JSON.stringify([created, ...existing]));
+        const emailKey = (user?.email || formData.email || 'guest').toLowerCase().trim();
+        const storageKey = `atelier_orders_${emailKey}`;
+        const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        localStorage.setItem(storageKey, JSON.stringify([created, ...existing]));
+        // Clean legacy global storage key if present
+        localStorage.removeItem('atelier_orders');
       } catch (storageErr) {
         console.error('Failed to save order to localStorage', storageErr);
       }

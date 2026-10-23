@@ -18,8 +18,11 @@ const orderSchema = new mongoose.Schema(
       sparse: true,
     },
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      type: mongoose.Schema.Types.Mixed,
+      required: false,
+    },
+    userEmail: {
+      type: String,
       required: false,
     },
     orderItems: [orderItemSchema],
