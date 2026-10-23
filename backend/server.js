@@ -320,8 +320,12 @@ connectDB().then(async (connected) => {
     try {
       const prodCount = await Product.countDocuments();
       if (prodCount === 0) {
-        await Product.insertMany(products);
-        console.log(`✓ Seeded ${products.length} initial Atelier garments into MongoDB`);
+        const formattedProducts = products.map((p) => ({
+          ...p,
+          _id: p._id || p.id,
+        }));
+        await Product.insertMany(formattedProducts);
+        console.log(`✓ Seeded ${formattedProducts.length} initial Atelier garments into MongoDB`);
       }
       const userCount = await User.countDocuments();
       if (userCount === 0) {
@@ -402,6 +406,17 @@ app.get('/api/products', async (req, res) => {
   // MongoDB Atlas Query
   if (getIsConnected()) {
     try {
+      let grandTotal = await Product.countDocuments({});
+      if (grandTotal === 0) {
+        const formattedProducts = products.map((p) => ({
+          ...p,
+          _id: p._id || p.id,
+        }));
+        await Product.insertMany(formattedProducts);
+        console.log(`✓ Auto-seeded ${formattedProducts.length} Atelier garments into MongoDB`);
+        grandTotal = await Product.countDocuments({});
+      }
+
       const query = {};
       if (category && category !== 'All') {
         query.category = { $regex: new RegExp(`^${category}$`, 'i') };
@@ -423,12 +438,14 @@ app.get('/api/products', async (req, res) => {
         .limit(Number(limit))
         .skip(Number(limit) * (Number(page) - 1));
 
-      return res.json({
-        products: dbProducts,
-        page: Number(page),
-        pages: Math.ceil(count / Number(limit)) || 1,
-        total: count,
-      });
+      if (grandTotal > 0) {
+        return res.json({
+          products: dbProducts,
+          page: Number(page),
+          pages: Math.ceil(count / Number(limit)) || 1,
+          total: count,
+        });
+      }
     } catch (err) {
       console.warn('MongoDB query fallback:', err.message);
     }

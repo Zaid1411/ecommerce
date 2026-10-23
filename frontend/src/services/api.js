@@ -61,6 +61,24 @@ export const productService = {
   getAll: async (params = {}) => {
     try {
       const response = await api.get('/products', { params });
+      if (response.data && Array.isArray(response.data.products) && response.data.products.length > 0) {
+        return response.data;
+      }
+      // If server returned an empty catalog (e.g. freshly connected DB being initialized), fallback
+      if (response.data && Array.isArray(response.data.products) && response.data.products.length === 0 && !params.search) {
+        let mockFiltered = [...MOCK_PRODUCTS];
+        if (params.category && params.category !== 'All') {
+          mockFiltered = mockFiltered.filter((p) => p.category.toLowerCase() === params.category.toLowerCase());
+        }
+        if (mockFiltered.length > 0) {
+          return {
+            products: mockFiltered,
+            page: 1,
+            pages: 1,
+            total: mockFiltered.length,
+          };
+        }
+      }
       return response.data;
     } catch (err) {
       console.warn('Backend API unavailable, serving local mock data', err.message);
