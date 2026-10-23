@@ -989,8 +989,14 @@ app.get('/api/health', (req, res) => {
 });
 
 // Production: Serve compiled frontend if dist folder exists
-const distPath = path.resolve(__dirname, '../frontend/dist');
-if (fs.existsSync(distPath)) {
+const possibleDistPaths = [
+  path.resolve(__dirname, '../frontend/dist'),
+  path.resolve(__dirname, '../dist'),
+  path.resolve(__dirname, './dist')
+];
+const distPath = possibleDistPaths.find((p) => fs.existsSync(p));
+
+if (distPath) {
   app.use(express.static(distPath));
   app.get('*', (req, res, next) => {
     if (req.originalUrl.startsWith('/api')) {
@@ -998,6 +1004,7 @@ if (fs.existsSync(distPath)) {
     }
     res.sendFile(path.join(distPath, 'index.html'));
   });
+  console.log(`✓ Serving compiled frontend static assets from: ${distPath}`);
 }
 
 // 404 Handler for undefined API routes
@@ -1016,7 +1023,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`✓ ATELIER Studio Edition API Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+// Start Server (listening on 0.0.0.0 for Render cloud hosting)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✓ ATELIER Studio Edition API Server running on port ${PORT}`);
 });

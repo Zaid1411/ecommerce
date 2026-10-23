@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Full Stack Luxury E-Commerce Platform inspired by Woodwrights",
   "scripts": {
-    "build": "npm --prefix frontend install && npm --prefix frontend run build && (rm -rf dist && cp -r frontend/dist dist)",
+    "build": "npm --prefix backend install && npm --prefix frontend install && npm --prefix frontend run build && (rm -rf dist && cp -r frontend/dist dist)",
     "build:all": "npm --prefix backend install && npm --prefix frontend install && npm --prefix frontend run build && (rm -rf dist && cp -r frontend/dist dist)",
     "start": "npm --prefix backend start",
     "dev:frontend": "npm --prefix frontend run dev",
