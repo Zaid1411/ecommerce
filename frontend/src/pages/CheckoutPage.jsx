@@ -30,30 +30,66 @@ export default function CheckoutPage() {
     sandboxMode: true,
   });
 
-  const [formData, setFormData] = useState({
-    fullName: user?.name || '',
-    email: user?.email || '',
-    phone: '',
-    address: '742 Evergreen Terrace',
-    city: 'New York',
-    postalCode: '10001',
-    country: 'United States',
-    notes: 'Please leave at front desk reception.',
+  const [formData, setFormData] = useState(() => {
+    const savedAddressKey = user?.email ? `atelier_address_${user.email.toLowerCase().trim()}` : null;
+    let saved = null;
+    if (savedAddressKey) {
+      try {
+        saved = JSON.parse(localStorage.getItem(savedAddressKey) || 'null');
+      } catch (e) {}
+    }
+    return {
+      fullName: user?.name || saved?.fullName || '',
+      email: user?.email || saved?.email || '',
+      phone: saved?.phone || '',
+      address: saved?.address || '',
+      city: saved?.city || '',
+      postalCode: saved?.postalCode || '',
+      country: saved?.country || '',
+      notes: saved?.notes || '',
+    };
   });
 
-  // Credit Card Input State
+  // Credit Card Input State - empty for clean user entry
   const [cardData, setCardData] = useState({
-    cardNumber: '4242 4242 4242 4242',
-    cardholderName: user?.name || 'SOPHIE LAURENT',
-    expiry: '12/28',
-    cvc: '382',
-    postalCode: '10001',
+    cardNumber: '',
+    cardholderName: user?.name ? user.name.toUpperCase() : '',
+    expiry: '',
+    cvc: '',
+    postalCode: '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [completedOrder, setCompletedOrder] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [paymentStepText, setPaymentStepText] = useState('');
+
+  // Sync user info into form without overwriting if already typed
+  useEffect(() => {
+    if (user) {
+      const savedAddressKey = `atelier_address_${user.email.toLowerCase().trim()}`;
+      let saved = null;
+      try {
+        saved = JSON.parse(localStorage.getItem(savedAddressKey) || 'null');
+      } catch (e) {}
+
+      setFormData((prev) => ({
+        ...prev,
+        fullName: prev.fullName || user.name || saved?.fullName || '',
+        email: user.email || prev.email || '',
+        phone: prev.phone || saved?.phone || '',
+        address: prev.address || saved?.address || '',
+        city: prev.city || saved?.city || '',
+        postalCode: prev.postalCode || saved?.postalCode || '',
+        country: prev.country || saved?.country || '',
+      }));
+
+      setCardData((prev) => ({
+        ...prev,
+        cardholderName: prev.cardholderName || user.name.toUpperCase(),
+      }));
+    }
+  }, [user]);
 
   // Fetch backend payment gateway configuration
   useEffect(() => {
@@ -112,7 +148,7 @@ export default function CheckoutPage() {
   const applySuccessTestCard = () => {
     setCardData({
       cardNumber: '4242 4242 4242 4242',
-      cardholderName: formData.fullName || 'SOPHIE LAURENT',
+      cardholderName: (formData.fullName || user?.name || 'TEST CLIENT').toUpperCase(),
       expiry: '12/28',
       cvc: '424',
       postalCode: formData.postalCode || '10001',
@@ -123,7 +159,7 @@ export default function CheckoutPage() {
   const applyDeclineTestCard = () => {
     setCardData({
       cardNumber: '4000 0000 0000 0002',
-      cardholderName: formData.fullName || 'TEST DECLINE',
+      cardholderName: (formData.fullName || user?.name || 'TEST CLIENT').toUpperCase(),
       expiry: '08/27',
       cvc: '002',
       postalCode: formData.postalCode || '10001',
@@ -246,6 +282,10 @@ export default function CheckoutPage() {
         const storageKey = `atelier_orders_${emailKey}`;
         const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
         localStorage.setItem(storageKey, JSON.stringify([created, ...existing]));
+        // Save delivery address for this user for future checkouts
+        if (emailKey && emailKey !== 'guest') {
+          localStorage.setItem(`atelier_address_${emailKey}`, JSON.stringify(formData));
+        }
         // Clean legacy global storage key if present
         localStorage.removeItem('atelier_orders');
       } catch (storageErr) {
@@ -473,6 +513,7 @@ export default function CheckoutPage() {
                     required
                     value={formData.country}
                     onChange={handleDeliveryChange}
+                    placeholder="e.g. United States"
                     className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
                   />
                 </div>
@@ -488,6 +529,7 @@ export default function CheckoutPage() {
                   required
                   value={formData.address}
                   onChange={handleDeliveryChange}
+                  placeholder="e.g. 124 Madison Avenue, Apt 4B"
                   className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
                 />
               </div>
@@ -503,6 +545,7 @@ export default function CheckoutPage() {
                     required
                     value={formData.city}
                     onChange={handleDeliveryChange}
+                    placeholder="e.g. New York"
                     className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
                   />
                 </div>
@@ -517,6 +560,7 @@ export default function CheckoutPage() {
                     required
                     value={formData.postalCode}
                     onChange={handleDeliveryChange}
+                    placeholder="e.g. 10001"
                     className="w-full border border-stone-300 p-2.5 text-xs focus:outline-none focus:border-stone-900"
                   />
                 </div>
@@ -602,7 +646,7 @@ export default function CheckoutPage() {
                       required
                       value={cardData.cardNumber}
                       onChange={handleCardNumberChange}
-                      placeholder="4242 4242 4242 4242"
+                      placeholder="0000 0000 0000 0000"
                       className="w-full border border-stone-300 p-2.5 text-xs font-mono tracking-wider focus:outline-none focus:border-stone-900 pr-10"
                     />
                     <CreditCard
@@ -622,7 +666,7 @@ export default function CheckoutPage() {
                     required
                     value={cardData.cardholderName}
                     onChange={(e) => setCardData({ ...cardData, cardholderName: e.target.value })}
-                    placeholder="SOPHIE LAURENT"
+                    placeholder="FIRSTNAME LASTNAME"
                     className="w-full border border-stone-300 p-2.5 text-xs uppercase focus:outline-none focus:border-stone-900"
                   />
                 </div>
@@ -638,7 +682,7 @@ export default function CheckoutPage() {
                       required
                       value={cardData.expiry}
                       onChange={handleExpiryChange}
-                      placeholder="12/28"
+                      placeholder="MM/YY"
                       className="w-full border border-stone-300 p-2.5 text-xs font-mono text-center focus:outline-none focus:border-stone-900"
                     />
                   </div>
